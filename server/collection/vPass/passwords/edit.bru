@@ -1,0 +1,29 @@
+meta {
+  name: edit
+  type: http
+  seq: 2
+}
+
+patch {
+  url: {{url}}/password/5aacc583-0bf4-438b-bd93-727c0385105c
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{token}}
+}
+
+body:json {
+  {
+    "password": "testing6"
+  }
+}
+
+tests {
+  const responseBody = res.getBody(); 
+  const newValue = responseBody.token; 
+  if(!newValue)return
+  bru.setEnvVar("token", newValue);
+  
+}

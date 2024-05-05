@@ -1,0 +1,29 @@
+meta {
+  name: edit
+  type: http
+  seq: 2
+}
+
+patch {
+  url: {{url}}/team/d8e36935-603c-42cd-bd94-e80e582d0ca4
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{token}}
+}
+
+body:json {
+  {
+    "name": "testing-team"
+  }
+}
+
+tests {
+  const responseBody = res.getBody(); 
+  const newValue = responseBody.token; 
+  if(!newValue)return
+  bru.setEnvVar("token", newValue);
+  
+}

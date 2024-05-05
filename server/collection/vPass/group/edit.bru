@@ -1,0 +1,29 @@
+meta {
+  name: edit
+  type: http
+  seq: 2
+}
+
+patch {
+  url: {{url}}/group/882ea38e-d5b0-47cf-83f5-360b80b4f917
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{token}}
+}
+
+body:json {
+  {
+    "name": "testing-group-edited"
+  }
+}
+
+tests {
+  const responseBody = res.getBody(); 
+  const newValue = responseBody.token; 
+  if(!newValue)return
+  bru.setEnvVar("token", newValue);
+  
+}

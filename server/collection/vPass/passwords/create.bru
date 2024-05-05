@@ -1,0 +1,30 @@
+meta {
+  name: create
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{url}}/password/
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{token}}
+}
+
+body:json {
+  {
+    "name": "test3",
+    "password": "testPass2"
+  }
+}
+
+tests {
+  const responseBody = res.getBody(); 
+  const newValue = responseBody.token; 
+  if(!newValue)return
+  bru.setEnvVar("token", newValue);
+  
+}

@@ -1,0 +1,23 @@
+meta {
+  name: me
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{url}}/user/me
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{token}}
+}
+
+body:json {
+  {
+    "email": "v@gmail.com",
+    "password": "varad123",
+    "username": "varad"
+  }
+}

@@ -1,0 +1,68 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id   String     @id @default(uuid())
+  username String
+  email    String  @unique
+  password String
+  salt     String
+  createdAt DateTime @default(now())
+  passwords Password[]
+  groups Group[]
+  userTeam UserTeam[]
+  teams Team[]
+}
+
+model Password {
+  id        String       @id @default(uuid())
+  name      String
+  encrypted String
+  key      String
+  iv      String
+  createdAt DateTime     @default(now())
+  userId    String
+  user      User         @relation(fields: [userId], references: [id])
+  groupId   String?
+  group      Group?         @relation(fields: [groupId], references: [id])
+  teamId    String?
+  team      Team?         @relation(fields: [teamId], references: [id])
+}
+
+model Group {
+  id        String       @id @default(uuid())
+  name      String
+  createdAt DateTime     @default(now())
+  userId   String
+  user      User         @relation(fields: [userId], references: [id])
+  passwords Password[]
+  teamId String?
+  team      Team?         @relation(fields: [teamId], references: [id])
+}
+
+model Team {
+  id        String       @id @default(uuid())
+  name      String
+  createdAt DateTime     @default(now())
+  userId   String
+  creator     User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  passwords Password[]
+  groups Group[]
+  userTeam UserTeam[]
+}
+
+
+model UserTeam {
+  id        String       @id @default(uuid())
+  userId    String
+  teamId    String
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  team      Team         @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  createdAt DateTime     @default(now())
+}

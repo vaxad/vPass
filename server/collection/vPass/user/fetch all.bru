@@ -1,0 +1,19 @@
+meta {
+  name: fetch all
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{url}}/user
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "email": "v@gmail.com",
+    "password": "varad123",
+    "username": "varad"
+  }
+}
