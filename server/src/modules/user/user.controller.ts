@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Req, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, Param, Patch, Post, Req, UseGuards } from "@nestjs/common";
 import { UserService } from "./user.service";
 import { ApiBody, ApiCreatedResponse, ApiOkResponse, ApiTags } from "@nestjs/swagger";
 import { SignupInputDto } from "./dto/signup.input.dto";
@@ -44,5 +44,36 @@ export class UserController{
     ){
         return {user:req.user, success:true}
     }
+
+    @Patch(":id/invite/:team")
+    @ApplyMiddleware()
+    @UseGuards(JwtGuard)
+    reqJoinTeam(
+        @Req() req:{user:User},
+        @Param("id") userId:string,
+        @Param("team") teamId:string
+    ){
+        return this.userService.reqJoinTeam(teamId, req.user.id, userId)
+    }
     
+    @Patch("join/:id")
+    @ApplyMiddleware()
+    @UseGuards(JwtGuard)
+    joinTeam(
+        @Req() req:{user:User},
+        @Param("id") teamId:string
+    ){
+        return this.userService.joinTeam(teamId,req.user.id)
+    }
+
+    @Patch("reject/:id")
+    @ApplyMiddleware()
+    @UseGuards(JwtGuard)
+    rejectTeam(
+        @Req() req:{user:User},
+        @Param("id") teamId:string
+    ){
+        return this.userService.rejectTeam(teamId,req.user.id)
+    }
+
 }

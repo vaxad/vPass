@@ -1,24 +1,17 @@
 meta {
-  name: edit
+  name: get all invites
   type: http
-  seq: 2
+  seq: 5
 }
 
-patch {
-  url: {{url}}/password/344904cb-bea5-4a3c-96d2-4686013c66a7
-  body: json
+get {
+  url: {{url}}/team/
+  body: none
   auth: none
 }
 
 headers {
   Authorization: Bearer {{token}}
-}
-
-body:json {
-  {
-    "public": "true",
-    "views": 2
-  }
 }
 
 tests {

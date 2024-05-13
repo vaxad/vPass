@@ -1,4 +1,4 @@
-import { IsString, IsOptional} from "class-validator"
+import { IsString, IsOptional, IsInt, IsBoolean, IsBooleanString} from "class-validator"
 
 export class EditPasswordDto {
   
@@ -17,4 +17,13 @@ export class EditPasswordDto {
   @IsString()
   @IsOptional()
   teamId?: string;
+  
+  @IsBooleanString()
+  @IsOptional()
+  public?:string;
+
+  @IsInt()
+  @IsOptional()
+  views?:number;
+
 }

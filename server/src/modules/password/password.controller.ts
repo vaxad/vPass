@@ -43,6 +43,50 @@ export class PasswordController{
     ){
         return this.passwordService.editPassword(payload,req.user.id, passId)
     }
+    
+    @Patch(":id/join/:team")
+    @ApplyMiddleware()
+    @UseGuards(JwtGuard)
+    addTeam(
+        @Req() req:{user:User},
+        @Param('id') passId: string,
+        @Param('team') teamId: string
+    ){
+        return this.passwordService.addToTeam(teamId, passId, req.user.id)
+    }
+
+    @Patch(":id/group/:group")
+    @ApplyMiddleware()
+    @UseGuards(JwtGuard)
+    addGroup(
+        @Req() req:{user:User},
+        @Param('id') passId: string,
+        @Param('group') groupId: string
+    ){
+        return this.passwordService.addToGroup(groupId, passId, req.user.id)
+    }
+
+    @Patch(":id/degroup/:group")
+    @ApplyMiddleware()
+    @UseGuards(JwtGuard)
+    deGroup(
+        @Req() req:{user:User},
+        @Param('id') passId: string,
+        @Param('group') groupId: string
+    ){
+        return this.passwordService.subFromGroup(groupId, passId, req.user.id)
+    }
+
+    @Patch(":id/remove/:team")
+    @ApplyMiddleware()
+    @UseGuards(JwtGuard)
+    subTeam(
+        @Req() req:{user:User},
+        @Param('id') passId: string,
+        @Param('team') teamId: string
+    ){
+        return this.passwordService.subFromTeam(teamId, passId, req.user.id)
+    }
 
     @Get(":id")
     @ApplyMiddleware()
@@ -52,6 +96,13 @@ export class PasswordController{
         @Param('id') passId: string
     ){
         return this.passwordService.getPassword(req.user.id, passId)
+    }
+
+    @Get("public/:id")
+    getPublic(
+        @Param('id') passId: string
+    ){
+        return this.passwordService.getPublicPassword(passId)
     }
 
     @Delete(":id")

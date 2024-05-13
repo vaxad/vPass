@@ -1,24 +1,17 @@
 meta {
-  name: edit
+  name: remove-team
   type: http
-  seq: 2
+  seq: 8
 }
 
 patch {
-  url: {{url}}/password/344904cb-bea5-4a3c-96d2-4686013c66a7
-  body: json
+  url: {{url}}/password/344904cb-bea5-4a3c-96d2-4686013c66a7/remove/b4588760-81c1-4fe3-a95e-6fca9c225ae3
+  body: none
   auth: none
 }
 
 headers {
   Authorization: Bearer {{token}}
-}
-
-body:json {
-  {
-    "public": "true",
-    "views": 2
-  }
 }
 
 tests {

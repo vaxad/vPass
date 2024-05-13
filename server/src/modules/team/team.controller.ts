@@ -31,6 +31,15 @@ export class PasswordController{
         return this.teamService.getAll(req.user.id)
     }
 
+    @Get("invitations")
+    @ApplyMiddleware()
+    @UseGuards(JwtGuard)
+    @ApiOkResponse({type:TeamEntity, isArray:true})
+    getAllInvites(@Req() req:{user:User}){
+        return this.teamService.getAllRequests(req.user.id)
+    }
+
+
     @Patch(":id")
     @ApplyMiddleware()
     @UseGuards(JwtGuard)

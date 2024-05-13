@@ -1,0 +1,15 @@
+meta {
+  name: reject-invite
+  type: http
+  seq: 7
+}
+
+patch {
+  url: {{url}}/user/join/b4588760-81c1-4fe3-a95e-6fca9c225ae3
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}

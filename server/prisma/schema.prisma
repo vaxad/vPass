@@ -24,10 +24,11 @@ model Password {
   id        String       @id @default(uuid())
   name      String
   encrypted String
-  key      String
   iv      String
   createdAt DateTime     @default(now())
   userId    String
+  public    Boolean      @default(false)
+  views     Int          @default(0)
   user      User         @relation(fields: [userId], references: [id])
   groupId   String?
   group      Group?         @relation(fields: [groupId], references: [id])
@@ -62,7 +63,11 @@ model UserTeam {
   id        String       @id @default(uuid())
   userId    String
   teamId    String
+  invited   Boolean      @default(true)
+  accepted  Boolean      @default(false) 
   user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   team      Team         @relation(fields: [teamId], references: [id], onDelete: Cascade)
   createdAt DateTime     @default(now())
+  
+  @@unique([userId, teamId])
 }

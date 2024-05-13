@@ -1,8 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "nestjs-prisma" 
 import { CreatePasswordDto } from "./dto/create.input.dto";
-import { JwtService } from "@nestjs/jwt"
-import { decrypt, encrypt } from "src/utils/cipher.utils";
+import { encrypt } from "src/utils/cipher.utils";
 import { EditPasswordDto } from "./dto/edit.input.dto";
 @Injectable()
 export class PasswordService {
@@ -13,18 +12,19 @@ export class PasswordService {
     async createPassword(payload: CreatePasswordDto, userId: string):Promise<any>{
         if(!userId) return {success:false, error:"User not found"};
         try {
-            const {encrypted, iv, key} = encrypt(payload.password);
+            const {encrypted, iv} = encrypt(payload.password);
             const password = await this.prisma.password.create({
                 data:{
                     name: payload.name,
                     encrypted,
                     iv,
-                    key,
                     userId: userId,
                 },
                 select:{
                     id:true,
                     name:true,
+                    public:true,
+                    views:true,
                     createdAt:true,
                     user:{
                         select:{
@@ -56,18 +56,36 @@ export class PasswordService {
 
     async getPassword(userId:string, passId:string):Promise<any>{
         if(!userId||!passId) return {success:false, error:"User not found"};
+        const user = await this.prisma.user.findFirst({
+            where:{
+                id:userId
+            },
+            select:{
+                userTeam:{
+                    select:{
+                        id:true,
+                        teamId:true
+                    }
+                }
+            }
+        })
+        if(!user) return {success:false, error:"User not found"};
         const passwordData = await this.prisma.password.findUnique({
             where:{
                 id:passId,
-                userId:userId
+                OR:[
+                    {userId: userId},
+                    {teamId: {in:user.userTeam.map((i)=>i.teamId)}}
+                ]
             },
             select:{
                 id:true,
                 name:true,
                 createdAt:true,
                 encrypted:true,
+                public:true,
+                views:true,
                 iv:true,
-                key:true,
                 user:{
                     select:{
                         id:true,
@@ -90,20 +108,88 @@ export class PasswordService {
             }
         })
         if(!passwordData) return {success:false, error:"Password not found"}
-        const password = decrypt(passwordData.encrypted, passwordData.key, passwordData.iv)
-        const { encrypted, key, iv, ...dataToSend } = passwordData;
-        return {success:true, password:{...dataToSend, password}}
+        // const password = decrypt(passwordData.encrypted, passwordData.iv)
+        return {success:true, password:passwordData}
+    }
+
+    async getPublicPassword(passId:string):Promise<any>{
+        if(!passId) return {success:false, error:"Password not found"};
+        const passwordData = await this.prisma.password.findUnique({
+            where:{
+                id:passId,
+                public:true,
+                views: {gt:0}
+            },
+            select:{
+                id:true,
+                name:true,
+                createdAt:true,   
+                public:true,
+                views:true,
+                encrypted:true,
+                iv:true,
+                user:{
+                    select:{
+                        id:true,
+                        email:true,
+                        username:true
+                    }
+                },
+                team:{
+                    select:{
+                        id:true,
+                        name:true
+                    }
+                },
+                group:{
+                    select:{
+                        id:true,
+                        name:true
+                    }
+                }
+            }
+        })
+        if(!passwordData) return {success:false, error:"Password not found"}
+        const editPassword = await this.prisma.password.update({
+            where:{
+                id:passwordData.id
+            },
+            data:{
+                views:{decrement:1},
+                public:passwordData.views>1
+            }
+        })
+        return {success:true, password:passwordData}
     }
 
     async getAll(userId:string){
+        const user = await this.prisma.user.findFirst({
+            where:{
+                id:userId
+            },
+            select:{
+                userTeam:{
+                    select:{
+                        id:true,
+                        teamId:true
+                    }
+                }
+            }
+        })
+        if(!user) return {success:false, error:"User not found"};
         const passwords = await this.prisma.password.findMany({
             where:{
-                userId
+                OR:[
+                    {userId: userId},
+                    {teamId: {in:user.userTeam.map((i)=>i.teamId)}}
+                ]
             },
             select:{
                 id:true,
                 name:true,
                 createdAt:true,
+                public:true,
+                views:true,
                 team:{
                     select:{
                         id:true,
@@ -138,7 +224,7 @@ export class PasswordService {
             }
         })
         if(!passwordData) return {success:false, error:"Password not found"};
-        const {encrypted, iv, key } = payload.password?encrypt(payload.password):{encrypted:passwordData.encrypted, iv:passwordData.iv, key:passwordData.key};
+        const {encrypted, iv } = payload.password?encrypt(payload.password):{encrypted:passwordData.encrypted, iv:passwordData.iv};
         const updatedPasswordData = await this.prisma.password.update({
             where:{
                 id:passId,
@@ -148,15 +234,18 @@ export class PasswordService {
                 name: payload.name?payload.name:passwordData.name,
                 encrypted,
                 iv,
-                key,
                 teamId: payload.teamId?payload.teamId:passwordData.teamId,
                 groupId: payload.groupId?payload.groupId:passwordData.groupId,
+                public: payload.public?payload.public==="true":passwordData.public,
+                views: payload.views?payload.views:passwordData.views
                 
             },
             select:{
                 id:true,
                 name:true,
                 createdAt:true,
+                public:true,
+                views:true,
                 team:{
                     select:{
                         id:true,
@@ -197,5 +286,83 @@ export class PasswordService {
             }
         })
         return {success:true, password:deletedPasswordData}
+    }
+
+    async addToTeam(teamId: string, passId:string, userId: string):Promise<any>{
+        if(!teamId||!passId)return {success:false, error:"Team or Password not found"}
+        try {
+        const password = await this.prisma.password.update({
+            where:{
+                id:passId,
+                userId:userId
+            },
+            data:{
+                teamId:teamId
+            }
+        })
+        if(!password)throw Error("Team or Password not found")
+        return {success:true, password}
+        } catch (error) {
+            return {success:false, error:"Team or Password not found"}
+        }
+    }
+
+    async subFromTeam(teamId: string, passId:string, userId: string):Promise<any>{
+        if(!teamId||!passId)return {success:false, error:"Team or Password not found"}
+
+        try {
+        const password = await this.prisma.password.update({
+            where:{
+                id:passId,
+                userId:userId
+            },
+            data:{
+                teamId:null
+            }
+        })
+        if(!password)throw Error("Team or Password not found")
+        return {success:true, password}
+        } catch (error) {
+            return {success:false, error:"Team or Password not found"}
+        }
+    }
+
+    
+    async addToGroup(groupId: string, passId:string, userId: string):Promise<any>{
+        if(!groupId||!passId)return {success:false, error:"Group or Password not found"}
+        try {
+        const password = await this.prisma.password.update({
+            where:{
+                id:passId,
+                userId:userId
+            },
+            data:{
+                groupId:groupId
+            }
+        })
+        if(!password)throw Error("Group or Password not found")
+        return {success:true, password}
+        } catch (error) {
+            return {success:false, error:"Group or Password not found"}
+        }
+    }
+
+    async subFromGroup(groupId: string, passId:string, userId: string):Promise<any>{
+        if(!groupId||!passId)return {success:false, error:"Group or Password not found"}
+        try {
+        const password = await this.prisma.password.update({
+            where:{
+                id:passId,
+                userId:userId
+            },
+            data:{
+                groupId:null
+            }
+        })
+        if(!password)throw Error("Group or Password not found")
+        return {success:true, password}
+        } catch (error) {
+            return {success:false, error:"Group or Password not found"}
+        }
     }
 }

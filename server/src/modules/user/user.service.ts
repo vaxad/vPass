@@ -68,4 +68,132 @@ export class UserService {
         });
         return {token, success:true};
     }
+
+    async reqJoinTeam(teamId:string, userId:string, joineeId:string){
+        if(!teamId||!userId||!joineeId)return {success:false, error:"Team or User not found"}
+        
+        try {
+            const team = await this.prisma.team.findFirst({
+                where:{
+                    id:teamId,
+                    OR:[
+                        { userId: userId },
+                        {
+                            userTeam:{
+                                some:{
+                                    userId:userId,
+                                    accepted:true
+                                }
+                            }
+                        }
+                    ]
+                }
+            })
+            if(!team)throw Error("Team or User not found")
+            const userTeam = await this.prisma.userTeam.create({
+                data:{
+                    userId:joineeId,
+                    teamId,
+                    accepted:false,
+                    invited:true,
+                },
+                select:{
+                    user:{
+                        select:{
+                            email:true,
+                            id:true,
+                            username:true
+                        }
+                    },
+                    team:{
+                        select:{
+                            name:true,
+                            id:true
+                        }
+                    }
+                }
+            })
+            if(!userTeam) throw Error("Team or User not found")
+            return {success:true, userTeam}
+        } catch (error) {
+            return {success:false, error:"Team or User not found"}
+        }
+    }
+
+    async joinTeam(teamId:string, userId:string){
+        if(!teamId||!userId)return {success:false, error:"Team or User not found"}
+        try {
+            const userTeam = await this.prisma.userTeam.update({
+                where:{
+                    userId_teamId:{
+                        userId:userId,
+                        teamId:teamId
+                    },
+                    invited:true,
+                },
+                data:{
+                    accepted:true,
+                    invited:false,
+                },
+                select:{
+                    user:{
+                        select:{
+                            email:true,
+                            id:true,
+                            username:true
+                        }
+                    },
+                    team:{
+                        select:{
+                            name:true,
+                            id:true
+                        }
+                    }
+                }
+            })
+            if(!userTeam) throw Error("Team or User not found")
+            return {success:true, userTeam}
+        } catch (error) {
+            return {success:false, error:"Team or User not found"}
+        }
+    }
+
+    
+    async rejectTeam(teamId:string, userId:string){
+        if(!teamId||!userId)return {success:false, error:"Team or User not found"}
+        try {
+            const userTeam = await this.prisma.userTeam.update({
+                where:{
+                    userId_teamId:{
+                        userId:userId,
+                        teamId:teamId
+                    },
+                    invited:true,
+                },
+                data:{
+                    accepted:false,
+                    invited:false,
+                },
+                select:{
+                    user:{
+                        select:{
+                            email:true,
+                            id:true,
+                            username:true
+                        }
+                    },
+                    team:{
+                        select:{
+                            name:true,
+                            id:true
+                        }
+                    }
+                }
+            })
+            if(!userTeam) throw Error("Team or User not found")
+            return {success:true, userTeam}
+        } catch (error) {
+            return {success:false, error:"Team or User not found"}
+        }
+    }
 }
