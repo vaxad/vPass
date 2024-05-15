@@ -1,0 +1,23 @@
+meta {
+  name: test py
+  type: http
+  seq: 12
+}
+
+get {
+  url: {{url}}/password/my
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{token}}
+}
+
+tests {
+  const responseBody = res.getBody(); 
+  const newValue = responseBody.token; 
+  if(!newValue)return
+  bru.setEnvVar("token", newValue);
+  
+}

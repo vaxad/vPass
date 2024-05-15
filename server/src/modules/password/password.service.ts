@@ -3,6 +3,7 @@ import { PrismaService } from "nestjs-prisma"
 import { CreatePasswordDto } from "./dto/create.input.dto";
 import { encrypt } from "src/utils/cipher.utils";
 import { EditPasswordDto } from "./dto/edit.input.dto";
+import { exec } from "child_process";
 @Injectable()
 export class PasswordService {
     constructor(
@@ -429,5 +430,21 @@ export class PasswordService {
         } catch (error) {
             return {success:false, error:"Group or Password not found"}
         }
+    }
+
+    async test(input:string):Promise<any>{
+        return new Promise((resolve, reject) => {
+            const process = exec(`python src/utils/py/model.py`, (error, stdout, stderr) => {
+                if (error) {
+                    console.error('Error executing Python script:', error);
+                    reject(error);
+                } else {
+                    console.log('Python script output:', stdout);
+                    resolve({success:true, output: stdout.trim()});
+                }
+            })
+            process.stdin.write(input)
+            process.stdin.end()
+        });
     }
 }

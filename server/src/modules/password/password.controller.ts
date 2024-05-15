@@ -41,6 +41,11 @@ export class PasswordController{
         return this.passwordService.getAllMy(req.user.id)
     }
 
+    @Get("test")
+    test(@Body() payload:{input:string}){
+        return this.passwordService.test(payload.input)
+    }
+
     @Patch(":id")
     @ApplyMiddleware()
     @UseGuards(JwtGuard)
