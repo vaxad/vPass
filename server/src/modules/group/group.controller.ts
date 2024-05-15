@@ -52,6 +52,16 @@ export class PasswordController{
         return this.groupService.getGroup(req.user.id, groupId)
     }
 
+    @Get(":id/passwords")
+    @ApplyMiddleware()
+    @UseGuards(JwtGuard)
+    getPasswords(
+        @Req() req:{user:User},
+        @Param('id') groupId: string
+    ){
+        return this.groupService.getAllPass(req.user.id, groupId)
+    }
+
     @Delete(":id")
     @ApplyMiddleware()
     @UseGuards(JwtGuard)
@@ -60,6 +70,28 @@ export class PasswordController{
         @Param('id') groupId: string
     ){
         return this.groupService.deleteGroup(req.user.id, groupId)
+    }
+
+    @Patch(":id/add/:team")
+    @ApplyMiddleware()
+    @UseGuards(JwtGuard)
+    addTeam(
+        @Req() req:{user:User},
+        @Param('id') groupId: string,
+        @Param('team') teamId: string
+    ){
+        return this.groupService.addToTeam(req.user.id, groupId, teamId)
+    }
+
+    @Patch(":id/remove/:team")
+    @ApplyMiddleware()
+    @UseGuards(JwtGuard)
+    removeTeam(
+        @Req() req:{user:User},
+        @Param('id') groupId: string,
+        @Param('team') teamId: string
+    ){
+        return this.groupService.subFromTeam(req.user.id, groupId, teamId)
     }
     
 }

@@ -33,6 +33,14 @@ export class PasswordController{
         return this.passwordService.getAll(req.user.id)
     }
 
+    @Get("my")
+    @ApplyMiddleware()
+    @UseGuards(JwtGuard)
+    @ApiOkResponse({type:PasswordEntity, isArray:true})
+    getAllMy(@Req() req:{user:User}){
+        return this.passwordService.getAllMy(req.user.id)
+    }
+
     @Patch(":id")
     @ApplyMiddleware()
     @UseGuards(JwtGuard)
@@ -53,6 +61,17 @@ export class PasswordController{
         @Param('team') teamId: string
     ){
         return this.passwordService.addToTeam(teamId, passId, req.user.id)
+    }
+    
+    @Patch(":id/remove/:team")
+    @ApplyMiddleware()
+    @UseGuards(JwtGuard)
+    subTeam(
+        @Req() req:{user:User},
+        @Param('id') passId: string,
+        @Param('team') teamId: string
+    ){
+        return this.passwordService.subFromTeam(teamId, passId, req.user.id)
     }
 
     @Patch(":id/group/:group")
@@ -75,17 +94,6 @@ export class PasswordController{
         @Param('group') groupId: string
     ){
         return this.passwordService.subFromGroup(groupId, passId, req.user.id)
-    }
-
-    @Patch(":id/remove/:team")
-    @ApplyMiddleware()
-    @UseGuards(JwtGuard)
-    subTeam(
-        @Req() req:{user:User},
-        @Param('id') passId: string,
-        @Param('team') teamId: string
-    ){
-        return this.passwordService.subFromTeam(teamId, passId, req.user.id)
     }
 
     @Get(":id")

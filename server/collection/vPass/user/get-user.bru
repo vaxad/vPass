@@ -1,13 +1,17 @@
 meta {
-  name: fetch all
+  name: get-user
   type: http
-  seq: 3
+  seq: 5
 }
 
 get {
-  url: {{url}}/user
+  url: {{url}}/user/bd1bbfd6-7db7-4d1b-b11f-725813690349
   body: json
   auth: none
+}
+
+headers {
+  Authorization: Bearer {{token}}
 }
 
 body:json {

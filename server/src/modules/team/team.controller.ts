@@ -61,6 +61,36 @@ export class PasswordController{
         return this.teamService.getTeam(req.user.id, teamId)
     }
 
+    @Get(":id/passwords")
+    @ApplyMiddleware()
+    @UseGuards(JwtGuard)
+    getPasswords(
+        @Req() req:{user:User},
+        @Param('id') teamId: string
+    ){
+        return this.teamService.getAllPass(req.user.id, teamId)
+    }
+
+    @Get(":id/groups")
+    @ApplyMiddleware()
+    @UseGuards(JwtGuard)
+    getGroups(
+        @Req() req:{user:User},
+        @Param('id') teamId: string
+    ){
+        return this.teamService.getAllGroups(req.user.id, teamId)
+    }
+
+    @Get(":id/users")
+    @ApplyMiddleware()
+    @UseGuards(JwtGuard)
+    getUsers(
+        @Req() req:{user:User},
+        @Param('id') teamId: string
+    ){
+        return this.teamService.getAllUsers(req.user.id, teamId)
+    }
+
     @Delete(":id")
     @ApplyMiddleware()
     @UseGuards(JwtGuard)

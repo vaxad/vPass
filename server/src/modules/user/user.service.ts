@@ -37,9 +37,86 @@ export class UserService {
         const user = await this.prisma.user.findUnique({
             where:{
                 id:userId
+            },
+            select:{
+                id:true,
+                username:true,
+                email:true,
+                createdAt: true,
+                _count:{
+                    select:{
+                        groups:true,
+                        teams:true,
+                        userTeam:true
+                    }
+                }
             }
         })
-        return {...user, password:"*******", salt:"*******"}
+        return user
+    }
+
+    async getMe(userId:string):Promise<any>{
+        // console.log({userId})
+        if(!userId) return {success: false, error: "User not found"}
+        const user = await this.prisma.user.findFirst({
+            where:{
+                id:userId
+            },
+            select:{
+                id:true,
+                username:true,
+                email:true,
+                createdAt: true,
+                groups:{
+                    select:{
+                        id:true,
+                        name:true,
+                        createdAt:true
+                    }
+                },
+                userTeam:{
+                    where:{
+                        accepted:true
+                    },
+                    select:{
+                        id:true,
+                        team:{
+                            select:{
+                                id:true,
+                                name:true,
+                                groups:{
+                                    select:{
+                                        id:true,
+                                        name:true,
+                                        createdAt:true
+                                    }
+                                }
+                            }
+
+                        }
+                    }
+                },
+                teams:{
+                    select:{
+                        id:true,
+                        name:true,
+                        creator:{
+                            select:{
+                                id:true,
+                                username:true
+                            }
+                        },
+                        groups:{
+                            select:{
+                                id:true,
+                                name:true,
+                            }
+                        }
+                    }
+                }
+            }
+        })
+        return { success: true, user}
     }
 
     async getAll(){
@@ -73,23 +150,6 @@ export class UserService {
         if(!teamId||!userId||!joineeId)return {success:false, error:"Team or User not found"}
         
         try {
-            const team = await this.prisma.team.findFirst({
-                where:{
-                    id:teamId,
-                    OR:[
-                        { userId: userId },
-                        {
-                            userTeam:{
-                                some:{
-                                    userId:userId,
-                                    accepted:true
-                                }
-                            }
-                        }
-                    ]
-                }
-            })
-            if(!team)throw Error("Team or User not found")
             const userTeam = await this.prisma.userTeam.create({
                 data:{
                     userId:joineeId,
@@ -157,7 +217,6 @@ export class UserService {
             return {success:false, error:"Team or User not found"}
         }
     }
-
     
     async rejectTeam(teamId:string, userId:string){
         if(!teamId||!userId)return {success:false, error:"Team or User not found"}

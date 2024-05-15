@@ -274,7 +274,157 @@ export class TeamService {
         return {success:true, team:deletedTeamData}
     }
 
+    async getAllPass(userId: string, teamId: string){
+        const passwords = await this.prisma.password.findMany({
+            where:{
+                teamId,
+                OR:[
+                    {userId},
+                    {team:{
+                        OR:[
+                            {userId},
+                            {userTeam:{
+                                some:{
+                                    userId
+                                }
+                            }}
+                        ]
+                    }}
+                ]
+            },
+            select:{
+                id:true,
+                name:true,
+                createdAt:true,
+                public:true,
+                views:true,
+                team:{
+                    select:{
+                        id:true,
+                        name:true
+                    }
+                },
+                user:{
+                    select:{
+                        id:true,
+                        email:true,
+                        username:true
+                    }
+                },
+                group:{
+                    select:{
+                        id:true,
+                        name:true
+                    }
+                }
 
+            }
+        })
+        return {success:true, passwords}
+    }
 
-    
+    async getAllGroups(userId:string, teamId:string){
+        const groups = await this.prisma.group.findMany({
+            where:{
+                teamId,
+                OR:[
+                    {userId:userId},
+                    {
+                        team:{
+                            OR:[
+                                {userId},
+                                {userTeam:{
+                                    some:{
+                                        userId
+                                    }
+                                }}
+                            ]
+                        }
+                    }
+                ]
+            },
+            select:{
+                id:true,
+                name:true,
+                createdAt:true,
+                user:{
+                    select:{
+                        id:true,
+                        email:true,
+                        username:true
+                    }
+                },
+                passwords:{
+                    select:{
+                        name:true,
+                        user:{
+                            select:{
+                                id:true,
+                                email:true,
+                                username:true
+                            }
+                        },
+                        createdAt:true,
+                        id:true
+                    }
+                },
+                team:{
+                    select:{
+                        id: true,
+                        name: true
+                    }
+                },
+                _count:{
+                    select:{
+                        passwords:true
+                    }
+                }
+            }
+        })
+        return {groups, success:true}
+    }
+
+    async getAllUsers(userId:string, teamId:string){
+        const users = await this.prisma.user.findMany({
+            where:{
+                OR:[
+                    {teams:{
+                        some:{
+                            id:teamId,
+                            OR:[
+                                {userId},
+                                {userTeam:{
+                                    some:{
+                                        userId
+                                    }
+                                }}
+                            ]
+                        }
+                    }},
+
+                    {userTeam:{
+                        some:{
+                            team:{
+                                id: teamId,
+                                OR:[
+                                    {userId},
+                                    {userTeam:{
+                                        some:{
+                                            userId
+                                        }
+                                    }}
+                                ]
+                            }
+                        }
+                    }}
+                ]
+            },
+            select:{
+                id:true,
+                email:true,
+                username:true,
+            }
+        })
+        return {users, success:true}
+    }
 }

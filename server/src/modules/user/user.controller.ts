@@ -42,7 +42,17 @@ export class UserController{
     getMe(
         @Req() req:{user:User}
     ){
-        return {user:req.user, success:true}
+        return this.userService.getMe(req.user.id)
+    }
+
+    @Get(":id")
+    @ApplyMiddleware()
+    @UseGuards(JwtGuard)
+    getUser(
+        @Req() req:{user:User},
+        @Param("id") userId:string
+    ){
+        return this.userService.getUser(userId)
     }
 
     @Patch(":id/invite/:team")

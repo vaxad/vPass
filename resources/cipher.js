@@ -1,7 +1,7 @@
 const crypto = require("crypto");
 
 const algorithm = "aes-256-cbc";
-
+// 
 function encrypt(text) {
   const key = "*********************";
   const iv = crypto.randomBytes(16);
