@@ -5,13 +5,19 @@ meta {
 }
 
 get {
-  url: {{url}}/password/my
-  body: none
+  url: {{url}}/password/test
+  body: json
   auth: none
 }
 
 headers {
   Authorization: Bearer {{token}}
+}
+
+body:json {
+  {
+    "input":"vara345678"
+  }
 }
 
 tests {

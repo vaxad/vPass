@@ -439,8 +439,8 @@ export class PasswordService {
                     console.error('Error executing Python script:', error);
                     reject(error);
                 } else {
-                    console.log('Python script output:', stdout);
-                    resolve({success:true, output: stdout.trim()});
+                    // console.log('Python script output:', stdout);
+                    resolve({success:true, output: parseFloat(stdout.trim())});
                 }
             })
             process.stdin.write(input)
