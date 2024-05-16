@@ -11,11 +11,15 @@ export default function Page() {
     const router = useRouter()
     const submitRef = useRef<HTMLButtonElement>(null)
     const initialOtp = []
-    const useRefs:React.RefObject<HTMLInputElement>[] = []
+    const u1 = useRef<HTMLInputElement>(null)
+    const u2 = useRef<HTMLInputElement>(null)
+    const u3 = useRef<HTMLInputElement>(null)
+    const u4 = useRef<HTMLInputElement>(null)
+    const u5 = useRef<HTMLInputElement>(null)
+    const u6 = useRef<HTMLInputElement>(null)
+    const useRefs:React.RefObject<HTMLInputElement>[] = [u1, u2, u3, u4, u5, u6]
     for(let i=0;i<otpLength;i++){
-        const u = useRef<HTMLInputElement>(null)
         initialOtp.push("")
-        useRefs.push(u);
     }
     const [otp, setOtp] = useState<string[]>(initialOtp)
     const {user} = useContext(context)

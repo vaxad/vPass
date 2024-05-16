@@ -43,7 +43,7 @@ export default function Page() {
             <button type='submit' className={` ${buttonClassNames} w-full font-semibold text-xl`}>
                 Submit
             </button>
-            <Link href={'/signup'} className=' w-full text-center py-3 underline active:scale-95 hover:scale-105 transition-all '>Don't have an account?</Link>
+            <Link href={'/signup'} className=' w-full text-center py-3 underline active:scale-95 hover:scale-105 transition-all '>Don&apos;t have an account?</Link>
         </form>
     </div>
   )
