@@ -1,0 +1,16 @@
+{
+  "name": "vpass",
+  "version": "1.0.0",
+  "description": "a password manager",
+  "main": "",
+  "scripts": {
+    "setup": "node resources/install.js",
+    "dev": "cd resources && start.bat",
+    "dev:win": "cd resources && start.bat",
+    "dev:mac": "cd resources && osascript start.scpt", 
+    "dev:lin":"cd resources && chmod +x start.sh && start.sh",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "vaxad",
+  "license": "ISC"
+}
