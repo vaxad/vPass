@@ -434,6 +434,14 @@ export class PasswordService {
 
     async test(input:string):Promise<any>{
         return new Promise((resolve, reject) => {
+            const version = exec(`python --version`, (error, stdout, stderr) => {
+                if (error) {
+                    console.error('Error executing Python script:', error);
+                    
+                } else {
+                    console.log('Python version:', stdout);
+                }
+            })
             const process = exec(`python src/utils/py/model.py`, (error, stdout, stderr) => {
                 if (error) {
                     console.error('Error executing Python script:', error);
