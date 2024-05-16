@@ -1,0 +1,21 @@
+meta {
+  name: verify
+  type: http
+  seq: 3
+}
+
+patch {
+  url: {{url}}/user/verify
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "otp":"069213"
+  }
+}

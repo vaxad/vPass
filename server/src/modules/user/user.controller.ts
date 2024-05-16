@@ -55,6 +55,25 @@ export class UserController{
         return this.userService.getUser(userId)
     }
 
+    @Patch("resend")
+    @ApplyMiddleware()
+    @UseGuards(JwtGuard)
+    resendOTP(
+        @Req() req:{user:User},
+    ){
+        return this.userService.resendOTP(req.user.id)
+    }
+
+    @Patch("verify")
+    @ApplyMiddleware()
+    @UseGuards(JwtGuard)
+    verifyUser(
+        @Req() req:{user:User},
+        @Body() payload: {otp:string}
+    ){
+        return this.userService.verifyUser(req.user.id, payload.otp)
+    }
+
     @Patch(":id/invite/:team")
     @ApplyMiddleware()
     @UseGuards(JwtGuard)
@@ -85,5 +104,7 @@ export class UserController{
     ){
         return this.userService.rejectTeam(teamId,req.user.id)
     }
+
+    
 
 }

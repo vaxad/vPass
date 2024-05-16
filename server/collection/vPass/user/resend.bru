@@ -1,0 +1,21 @@
+meta {
+  name: resend
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{url}}/user/resend
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    
+  }
+}

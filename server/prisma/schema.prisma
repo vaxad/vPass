@@ -13,6 +13,9 @@ model User {
   email    String  @unique
   password String
   salt     String
+  otp      String?
+  otpCreatedAt DateTime @default(now())
+  verified  Boolean @default(false)
   createdAt DateTime @default(now())
   passwords Password[]
   groups Group[]

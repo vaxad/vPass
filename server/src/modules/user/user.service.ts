@@ -3,28 +3,36 @@ import { PrismaService } from "nestjs-prisma"
 import { SignupInputDto } from "./dto/signup.input.dto";
 import { hashPassword, verifyPassword } from "src/utils/hashPassword";
 import { JwtService } from "@nestjs/jwt"
-import { User } from "@prisma/client";
+import { MailerService } from "@nestjs-modules/mailer";
+import { generateOTP } from "src/utils/functions";
+
+
 @Injectable()
 export class UserService {
     constructor(
         private readonly prisma: PrismaService,
-        private readonly jwtService: JwtService
+        private readonly jwtService: JwtService,
+        private readonly mailService: MailerService
     ){}
 
     async createUser(payload: SignupInputDto):Promise<any>{
         try {
             const {hash, salt} = hashPassword(payload.password);
+            const otp = generateOTP(6);
             const user = await this.prisma.user.create({
                 data:{
                     ...payload,
                     password: hash,
-                    salt
+                    salt,
+                    otp,
+                    otpCreatedAt: new Date(Date.now())
                 }
             });
             const token = this.jwtService.sign({userId: user.id}, {
                 expiresIn: "1d",
                 secret: process.env.JWT_SECRET
             });
+            this.sendOTPMail(user.id)
             return {token, success:true};
         } catch (error) {
             console.log({error})
@@ -67,6 +75,7 @@ export class UserService {
                 username:true,
                 email:true,
                 createdAt: true,
+                verified:true,
                 groups:{
                     select:{
                         id:true,
@@ -255,4 +264,74 @@ export class UserService {
             return {success:false, error:"Team or User not found"}
         }
     }
+
+    async resendOTP(userId:string){
+        try {
+            const otp = generateOTP(6);
+            const user = await this.prisma.user.update({
+                where:{
+                    id:userId,
+                    verified:false
+                },
+                data:{
+                    otp,
+                    otpCreatedAt: new Date(Date.now())
+                }
+            })
+            this.sendOTPMail(user.id)
+            return {success:true}
+        } catch (error) {
+            return {success:false, error:"User not found!"}
+        }
+    }
+
+    async sendOTPMail(userId: string) {
+        try {
+            const user = await this.prisma.user.findFirst({
+                where:{
+                    id:userId
+                }
+            })
+            if(user)
+            await this.mailService.sendMail({
+            from: 'Team vPass <prabhuvrd@gmail.com>',
+            to: user.email,
+            subject: `OTP for validation`,
+            html: `
+                <p>Dear ${user.username},</p>
+                <p>Welcome to vPass, your trusted password manager! We're excited to have you onboard and help you secure your digital life effortlessly.</p>
+                <p>To complete your registration and start using vPass, please use the following OTP (One-Time Password):</p>
+                <p><strong>OTP: ${user.otp}</strong></p>
+                <p>Please enter this OTP within the vPass app to verify your email address and complete the onboarding process. This OTP will only be valid for the next 10 minutes</p>
+                <p>If you have any questions or need assistance, don't hesitate to reach out to our support team at <a href="mailto:prabhuvrd@gmail.com">prabhuvrd@gmail.com</a>. We're here to help!</p>
+                <p>Best regards,</p>
+                <p>Varad Prabhu<br/>vPass Team</p>
+            `
+            });      
+        } catch (error) {
+           console.log(error)     
+        }
+    }
+
+    async verifyUser(userId:string, otp: string){
+        const user = await this.prisma.user.findFirst({
+            where:{
+                id:userId
+            }
+        })
+        if(!user) return {success: false, error:"User not found!"}
+        const verified = user.otp && user.otp === otp && ((new Date(user.otpCreatedAt)).getTime()+(10*60*1000)) > Date.now()
+        if(!verified) return {success: false, error:"Invalid OTP"}
+        const update = await this.prisma.user.update({
+            where:{
+                id:userId
+            },
+            data:{
+                verified:true
+            }
+        })
+        return {success: true, verified}
+
+    }
+    
 }

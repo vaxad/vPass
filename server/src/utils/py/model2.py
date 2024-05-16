@@ -24,8 +24,6 @@ def predict_strength(password, model):
 
 if __name__ == "__main__":
     input_data = sys.stdin.read()
-    # model = load_model("src/utils/py/password_strength_model.joblib")
-    # predictions = predict_strength(input_data, model)
-    model = load_model("src/utils/py/model.pkl")
-    predictions = model.predict([input_data])
+    model = load_model("src/utils/py/password_strength_model.joblib")
+    predictions = predict_strength(input_data, model)
     print(predictions)

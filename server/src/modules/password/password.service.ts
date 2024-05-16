@@ -434,15 +434,23 @@ export class PasswordService {
 
     async test(input:string):Promise<any>{
         return new Promise((resolve, reject) => {
-            const version = exec(`python -m pip install joblib scikit-learn pandas`, (error, stdout, stderr) => {
+            const process = exec(`python src/utils/py/model.py`, (error, stdout, stderr) => {
                 if (error) {
                     console.error('Error executing Python script:', error);
-                    
+                    reject(error);
                 } else {
-                    console.log('Python version:', stdout);
+                    // console.log('Python script output:', stdout);
+                    resolve({success:true, output: stdout});
                 }
             })
-            const process = exec(`python src/utils/py/model.py`, (error, stdout, stderr) => {
+            process.stdin.write(input)
+            process.stdin.end()
+        });
+    }
+
+    async test2(input:string):Promise<any>{
+        return new Promise((resolve, reject) => {
+            const process = exec(`python src/utils/py/model2.py`, (error, stdout, stderr) => {
                 if (error) {
                     console.error('Error executing Python script:', error);
                     reject(error);
