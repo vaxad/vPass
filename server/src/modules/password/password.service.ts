@@ -434,7 +434,7 @@ export class PasswordService {
 
     async test(input:string):Promise<any>{
         return new Promise((resolve, reject) => {
-            const version = exec(`python --version`, (error, stdout, stderr) => {
+            const version = exec(`python -m pip install joblib scikit-learn pandas`, (error, stdout, stderr) => {
                 if (error) {
                     console.error('Error executing Python script:', error);
                     
