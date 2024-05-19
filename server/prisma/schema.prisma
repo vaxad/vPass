@@ -44,10 +44,11 @@ model Group {
   name      String
   createdAt DateTime     @default(now())
   userId   String
+  default   Boolean       @default(false)
   user      User         @relation(fields: [userId], references: [id])
   passwords Password[]
-  teamId String?
-  team      Team?         @relation(fields: [teamId], references: [id])
+  teamId String
+  team      Team        @relation(fields: [teamId], references: [id])
 }
 
 model Team {
@@ -55,6 +56,7 @@ model Team {
   name      String
   createdAt DateTime     @default(now())
   userId   String
+  personal Boolean       @default(false)
   creator     User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   passwords Password[]
   groups Group[]

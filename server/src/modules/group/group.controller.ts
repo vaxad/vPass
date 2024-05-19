@@ -20,7 +20,7 @@ export class PasswordController{
     @ApplyMiddleware()
     @UseGuards(JwtGuard)
     create(@Body() payload: CreateGroupDto, @Req() req:{user:User}){
-        return this.groupService.createGroup(payload, req.user.id)
+        return this.groupService.createGroup(payload.name, req.user.id, payload.teamId )
     }
 
     @Get()

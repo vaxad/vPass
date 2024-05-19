@@ -40,7 +40,17 @@ export class TeamService {
             const userTeam = await this.prisma.userTeam.create({
                 data:{
                     userId,
-                    teamId:team.id
+                    teamId:team.id,
+                    invited:false,
+                    accepted:true
+                }
+            })
+            const group = await this.prisma.group.create({
+                data:{
+                    name:`General`,
+                    teamId:team.id,
+                    userId:userId,
+                    default:true
                 }
             })
             return {success:true, team};
@@ -55,17 +65,12 @@ export class TeamService {
         const team = await this.prisma.team.findUnique({
             where:{
                 id:teamId,
-                OR:[
-                    { userId: userId},
-                    {
-                        userTeam: {
-                            some: {
-                                userId:userId,
-                                accepted:true
-                            }
-                        }
+                userTeam: {
+                    some: {
+                        userId:userId,
+                        accepted:true
                     }
-                ]
+                }
             },
             select:{
                 id:true,
@@ -106,17 +111,12 @@ export class TeamService {
     async getAll(userId:string){
         const teams = await this.prisma.team.findMany({
             where:{
-                OR:[
-                { userId:userId },
-                {
-                    userTeam: {
-                        some: {
-                            userId:userId,
-                            accepted:true
-                        }
+                userTeam: {
+                    some: {
+                        userId:userId,
+                        accepted:true
                     }
                 }
-                ]
             },
             select:{
                 id:true,
@@ -156,18 +156,13 @@ export class TeamService {
     async getAllRequests(userId:string){
         const teams = await this.prisma.team.findMany({
             where:{
-                OR:[
-                { userId:userId },
-                {
-                    userTeam: {
-                        some: {
-                            userId:userId,
-                            accepted:false,
-                            invited:true
-                        }
+                userTeam: {
+                    some: {
+                        userId:userId,
+                        accepted:false,
+                        invited:true
                     }
                 }
-                ]
             },
             select:{
                 id:true,
@@ -261,7 +256,8 @@ export class TeamService {
         const team = await this.prisma.team.findUnique({
             where:{
                 id:teamId,
-                userId:userId
+                userId:userId,
+                personal:false
             }
         })
         if(!team) return {success:false, error:"Team not found"};
@@ -278,19 +274,13 @@ export class TeamService {
         const passwords = await this.prisma.password.findMany({
             where:{
                 teamId,
-                OR:[
-                    {userId},
-                    {team:{
-                        OR:[
-                            {userId},
-                            {userTeam:{
-                                some:{
-                                    userId
-                                }
-                            }}
-                        ]
-                    }}
-                ]
+                team:{
+                    userTeam:{
+                        some:{
+                            userId
+                        }
+                    }
+                }
             },
             select:{
                 id:true,
@@ -327,21 +317,14 @@ export class TeamService {
         const groups = await this.prisma.group.findMany({
             where:{
                 teamId,
-                OR:[
-                    {userId:userId},
-                    {
-                        team:{
-                            OR:[
-                                {userId},
-                                {userTeam:{
-                                    some:{
-                                        userId
-                                    }
-                                }}
-                            ]
+                team:{
+                    userTeam:{
+                        some:{
+                            userId
                         }
                     }
-                ]
+                }
+                    
             },
             select:{
                 id:true,
@@ -387,37 +370,12 @@ export class TeamService {
     async getAllUsers(userId:string, teamId:string){
         const users = await this.prisma.user.findMany({
             where:{
-                OR:[
-                    {teams:{
-                        some:{
-                            id:teamId,
-                            OR:[
-                                {userId},
-                                {userTeam:{
-                                    some:{
-                                        userId
-                                    }
-                                }}
-                            ]
-                        }
-                    }},
-
-                    {userTeam:{
-                        some:{
-                            team:{
-                                id: teamId,
-                                OR:[
-                                    {userId},
-                                    {userTeam:{
-                                        some:{
-                                            userId
-                                        }
-                                    }}
-                                ]
-                            }
-                        }
-                    }}
-                ]
+                userTeam:{
+                    some:{
+                        teamId,
+                        userId
+                    }
+                }
             },
             select:{
                 id:true,

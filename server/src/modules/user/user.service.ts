@@ -33,6 +33,29 @@ export class UserService {
                 secret: process.env.JWT_SECRET
             });
             this.sendOTPMail(user.id)
+            const team = await this.prisma.team.create({
+                data:{
+                    name:`${user.username}'s Personal Team`,
+                    userId:user.id,
+                    personal:true,
+                }
+            })
+            const userTeam = await this.prisma.userTeam.create({
+                data:{
+                    userId:user.id,
+                    teamId:team.id,
+                    invited: false,
+                    accepted: true,
+                }
+            })
+            const group = await this.prisma.group.create({
+                data:{
+                    name:"General",
+                    default:true,
+                    teamId:team.id,
+                    userId:user.id
+                }
+            })
             return {token, success:true};
         } catch (error) {
             console.log({error})
@@ -42,7 +65,7 @@ export class UserService {
 
     async getUser(userId:string):Promise<any>{
         if(!userId) return null
-        const user = await this.prisma.user.findUnique({
+        const user = await this.prisma.user.findFirst({
             where:{
                 id:userId
             },
@@ -104,24 +127,6 @@ export class UserService {
 
                         }
                     }
-                },
-                teams:{
-                    select:{
-                        id:true,
-                        name:true,
-                        creator:{
-                            select:{
-                                id:true,
-                                username:true
-                            }
-                        },
-                        groups:{
-                            select:{
-                                id:true,
-                                name:true,
-                            }
-                        }
-                    }
                 }
             }
         })
@@ -159,6 +164,13 @@ export class UserService {
         if(!teamId||!userId||!joineeId)return {success:false, error:"Team or User not found"}
         
         try {
+            const team = await this.prisma.team.findFirst({
+                where:{
+                    id:teamId,
+                    personal:false
+                }
+            })
+            if(!team)return {success:false, error:'Cannot invite others to personal teams!'}
             const userTeam = await this.prisma.userTeam.create({
                 data:{
                     userId:joineeId,
