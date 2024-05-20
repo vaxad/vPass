@@ -9,6 +9,13 @@ export type LoginData = {
     email: string,
     password: string,
 }
+
+export type CreatePasswordData = {
+    name: string,
+    groupId: string,
+    password: string,
+    teamId: string,
+}
   
 export type User = {
     id:   string,
@@ -20,10 +27,15 @@ export type User = {
     otpCreatedAt: Date, 
     verified:  boolean, 
     createdAt: Date,
-    passwords: Password[]
-    groups: Group[]
-    userTeam: UserTeam[]
-    teams: Team[]
+    passwords: Password[],
+    groups: Group[],
+    userTeam: UserTeam[],
+    teams: Team[],
+    _count: {
+        passwords?: number
+        groups?: number
+        userTeam?: number
+    }
 }
 
 export type Password = {
@@ -35,22 +47,25 @@ export type Password = {
     userId:    string,
     public:    boolean,
     views:     number,      
-    user:      User     
-    groupId?:   string,
-    group?:      Group  
-    teamId?:    string,
-    team?:      Team   
+    user:      User,     
+    groupId:   string,
+    group:      Group  
+    teamId:    string,
+    team:      Team,  
 }
 
 export type Group = {
     id:        string      
     name:      string,
     createdAt: Date,    
-    userId:   string,
-    user:      User        
-    passwords: Password[]
-    teamId?: string,
-    team?:      Team      
+    user:      User,    
+    default: boolean,   
+    passwords: Password[],
+    team:      Team,   
+    _count: {
+        passwords?: number
+    }   
+
 }
 
 export type Team = {
@@ -58,10 +73,16 @@ export type Team = {
     name:      string,
     createdAt: Date,   
     userId:   string,
-    creator:     User       
-    passwords: Password[]
-    groups: Group[]
-    userTeam: UserTeam[]
+    personal: boolean,
+    creator:     User,       
+    passwords: Password[],
+    groups: Group[],
+    userTeam: UserTeam[],
+    _count: {
+        passwords?: number
+        groups?: number
+        userTeam?: number
+    }
 }
 
 
@@ -69,9 +90,9 @@ export type UserTeam = {
     id:        string       
     userId:    string,
     teamId:    string,
-    invited:   boolean      
-    accepted:  boolean      
-    user:      User         
-    team:      Team         
-    createdAt: Date    
+    invited:   boolean,     
+    accepted:  boolean,     
+    user:      User,         
+    team:      Team,         
+    createdAt: Date,    
 }

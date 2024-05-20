@@ -20,6 +20,7 @@ export class TeamService {
                     id:true,
                     name:true,
                     createdAt:true,
+                    personal:true,
                     creator:{
                         select:{
                             id:true,
@@ -75,6 +76,7 @@ export class TeamService {
             select:{
                 id:true,
                 name:true,
+                personal:true,
                 createdAt:true,
                 creator:{
                     select:{
@@ -121,6 +123,7 @@ export class TeamService {
             select:{
                 id:true,
                 name:true,
+                personal:true,
                 createdAt:true,
                 creator:{
                     select:{
@@ -167,6 +170,7 @@ export class TeamService {
             select:{
                 id:true,
                 name:true,
+                personal:true,
                 createdAt:true,
                 creator:{
                     select:{
@@ -218,6 +222,7 @@ export class TeamService {
             },
             select:{
                 id:true,
+                personal:true,
                 name:true,
                 createdAt:true,
                 creator:{

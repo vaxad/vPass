@@ -1,5 +1,5 @@
 import { toast } from "sonner";
-import { LoginData, SignupData } from "./types";
+import { CreatePasswordData, LoginData, SignupData } from "./types";
 import axios, { AxiosResponse } from "axios"
 
 const url = process.env.NEXT_PUBLIC_API_URL
@@ -85,5 +85,47 @@ export const apiHandler = {
         } catch (error) {
             return toast(catchErrorMessage)
         }
-    }
+    },
+    getMyTeams: async() => {
+        try{
+            const headers = authHeaders()
+            if(!headers) return null;
+            const res = await axios.get(`${url}/team/`,headers);
+            return respond(res);
+        }catch(error){
+            return toast(catchErrorMessage)
+        }
+    },
+    getMyGroups: async() => {
+        try{
+            const headers = authHeaders()
+            if(!headers) return null;
+            const res = await axios.get(`${url}/group/`,headers);
+            return respond(res);
+        }catch(error){
+            return toast(catchErrorMessage)
+        }
+    },
+    createPassword: async(data:CreatePasswordData) => {
+        try{
+            const headers = authHeaders()
+            if(!headers) return null;
+            const res = await axios.post(`${url}/password/`,{
+                ...data
+            },headers)
+            return respond(res)   
+        }catch(error){
+            return toast(catchErrorMessage)
+        }
+    },
+    getPasswordsGeneral: async({teamId="", groupId="", orderBy="", limit="", offset="", isPublic=""}:{teamId?:string, groupId?:string, limit?:number|"", offset?:number|"", orderBy?:"name"|"date"|"", isPublic?:boolean|""}) => {
+        try{
+            const headers = authHeaders()
+            if(!headers) return null;
+            const res = await axios.get(`${url}/password/all?groupId=${groupId}&teamId=${teamId}&orderBy=${orderBy}&isPublic=${isPublic}&limit=${limit}&offset=${offset}`,headers);
+            return respond(res);
+        }catch(error){
+            return toast(catchErrorMessage)
+        }
+    },
 }

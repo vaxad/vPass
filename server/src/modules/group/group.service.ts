@@ -40,6 +40,7 @@ export class GroupService {
                 select:{
                     id:true,
                     name:true,
+                    default:true,
                     createdAt:true,
                     user:{
                         select:{
@@ -99,6 +100,7 @@ export class GroupService {
             select:{
                 id:true,
                 name:true,
+                default:true,
                 createdAt:true,
                 user:{
                     select:{
@@ -152,6 +154,7 @@ export class GroupService {
             },
             select:{
                 id:true,
+                default:true,
                 name:true,
                 createdAt:true,
                 user:{
@@ -218,6 +221,7 @@ export class GroupService {
             select:{
                 id:true,
                 name:true,
+                default:true,
                 createdAt:true,
                 user:{
                     select:{

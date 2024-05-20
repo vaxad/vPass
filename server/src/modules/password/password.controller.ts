@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Req, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Req, UseGuards } from "@nestjs/common";
 import { PasswordService } from "./password.service";
 import { ApiBody, ApiCreatedResponse, ApiOkResponse, ApiTags } from "@nestjs/swagger";
 import { CreatePasswordDto } from "./dto/create.input.dto";
@@ -8,6 +8,7 @@ import { JwtGuard } from "../auth/auth.guard";
 import { ApplyMiddleware } from "src/utils/applyMiddleware.decorator";
 import { User } from "@prisma/client";
 import { EditPasswordDto } from "./dto/edit.input.dto";
+import { PasswordQueryParamsDto } from "./dto/password.queryparams.dto";
 
 @Controller("password")
 @ApiTags("password")
@@ -31,6 +32,20 @@ export class PasswordController{
     @ApiOkResponse({type:PasswordEntity, isArray:true})
     getAll(@Req() req:{user:User}){
         return this.passwordService.getAll(req.user.id)
+    }
+    
+    @Get("all")
+    @ApplyMiddleware()
+    @UseGuards(JwtGuard)
+    @ApiOkResponse({type:PasswordEntity, isArray:true})
+    getAllGeneral(@Req() req:{user:User}, @Query() query: any){
+        const passwordQueryParams = {
+            ...query,
+            limit: query.limit ? parseInt(query.limit, 10) : 15,
+            offset: query.offset ? parseInt(query.offset, 10) : 0,
+            isPublic: query.isPublic ? query.isPublic === 'true' : false,
+          };
+        return this.passwordService.getAllGeneral({userId:req.user.id, passwordQueryParams})
     }
 
     @Get("my")
