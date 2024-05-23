@@ -15,8 +15,7 @@ export default function Page() {
     const [teams, setTeams] = useState<Team[]>([])
     const [groups, setGroups] = useState<Group[]>([])
     const [show, setShow] = useState(false)
-    const [data, handleChange, changeValue] = useForm<CreatePasswordData>({name:"", password:"", groupId:"", teamId:""})
-    
+    const [data, handleChange, changeValue] = useForm<CreatePasswordData>({name:"", password:"", groupId:"", teamId:"", public:"false", views:0}) 
     const router = useRouter()
 
     async function getInitialData(){
@@ -35,6 +34,12 @@ export default function Page() {
     }, [])
 
     useEffect(() => {
+      if(data.public==="false")
+        changeValue({name:"views",value:0})
+    }, [data.public])
+    
+
+    useEffect(() => {
       if(data.teamId==="")return
       const reqGrp = groups.find((val, idx)=> (val.team.id===data.teamId && val.default))
       if(!reqGrp) return
@@ -48,11 +53,13 @@ export default function Page() {
         toast(`Successfully created password for ${data.name}!`)
         router.replace("/passwords")
     }
-    
+
+    const visibilityOptions = [{value:"false", name:"Private"}, {value:"true", name:"Public"}]
+    const viewOptions = [...Array(51)].map((_, id)=>id).filter((it)=>it%5===0)
   return (
     <div className=' flex flex-col gap-6 px-6 md:px-12 lg:px-24 py-12 bg-zinc-950 text-slate-50'>
         <Header text='Create a password'/>
-        <form onSubmit={handleFormSubmit} className=' flex flex-col gap-2 bg-slate-50 text-zinc-950 p-6 rounded-md border border-slate-600 '>
+        <form onSubmit={handleFormSubmit} className=' flex flex-col gap-2 bg-slate-50 text-zinc-950 p-3 md:p-6 rounded-md border border-slate-600 '>
             <article className=' flex flex-col gap-1 w-full'>
                 <label htmlFor="name">Name</label>
                 <input required minLength={3} name='name' className=' w-full px-4 py-2 rounded-md outline-none text-slate-50 bg-zinc-950 focus:bg-slate-50 focus:text-zinc-950 border border-zinc-950 transition-all' type="text" placeholder='ATM PIN' value={data.name} onChange={handleChange} />
@@ -65,7 +72,7 @@ export default function Page() {
                     <h3 className=' text-xs'>Show password</h3>
                 </div>
             </article>
-            <article className=' flex flex-row gap-2 w-full'>
+            <article className=' flex flex-col md:flex-row gap-2 w-full'>
                 <section className=' flex flex-col gap-1 w-full'>
                     <label htmlFor="team">Team</label>
                     <select className=' w-full px-4 py-2 rounded-md outline-none text-slate-50 bg-zinc-950 focus:bg-slate-50 focus:text-zinc-950 border border-zinc-950 transition-all' name="teamId" id="team-select" onChange={handleChange}>
@@ -82,6 +89,28 @@ export default function Page() {
                         {groups.filter((item, idx)=>(item.team.id===(data.teamId!==""?data.teamId:teams.length>0?item.team.id===teams[0].id:""))).map((item, idx) => {
                                 return  (
                                     <option key={item.id} value={item.id}>{item.name+` (${item.team?.name})`}</option>
+                                )
+                            })}
+                    </select>
+                </section>
+            </article>
+            <article className=' flex flex-col md:flex-row gap-2 w-full'>
+                <section className=' flex flex-col gap-1 w-full'>
+                    <label htmlFor="team">Visibility</label>
+                    <select className=' w-full px-4 py-2 rounded-md outline-none text-slate-50 bg-zinc-950 focus:bg-slate-50 focus:text-zinc-950 border border-zinc-950 transition-all' name="public" id="public-select" onChange={handleChange}>
+                        {visibilityOptions.map((item, idx) => {
+                            return  (
+                                <option key={idx} value={item.value}>{item.name}</option>
+                            )
+                        })}
+                    </select>
+                </section>
+                <section className=' flex flex-col gap-1 w-full'>
+                    <label htmlFor="group">Views</label>
+                    <select disabled={data.public!=="true"} className=' w-full px-4 py-2 rounded-md outline-none text-slate-50 bg-zinc-950 focus:bg-slate-50 focus:text-zinc-950 border border-zinc-950 transition-all' name="views" id="views-select" onChange={handleChange}>
+                        {viewOptions.map((item, idx) => {
+                                return  (
+                                    <option key={idx} value={item}>{item}</option>
                                 )
                             })}
                     </select>

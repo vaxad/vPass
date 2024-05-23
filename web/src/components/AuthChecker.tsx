@@ -9,10 +9,10 @@ export default function AuthChecker() {
     const path = usePathname()
     const {user, setUser} = useContext(context)
     const router = useRouter()
-    const publicPaths = ["/","/login","/signup"]
-    const authPaths = ["/passwords","/otp","/teams"]
+    const publicPaths = ["/","/login","/signup","/public"]
+    const authPaths = ["/passwords","/otp","/teams","/public"]
     function isPublic(path: string){
-        return publicPaths.includes(path)
+        return path.startsWith("/public") || publicPaths.includes(path)
     }
     function isPrivate(path: string){
         if(path==='/')return true;

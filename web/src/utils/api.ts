@@ -128,4 +128,44 @@ export const apiHandler = {
             return toast(catchErrorMessage)
         }
     },
+    getPasswordById: async({passId}:{passId:string}) => {
+        try{
+            const headers = authHeaders()
+            if(!headers) return null;
+            const res = await axios.get(`${url}/password/${passId}`,headers);
+            return respond(res);
+        }catch(error){
+            return toast(catchErrorMessage)
+        }
+    },
+    getPublicPasswordById: async({passId}:{passId:string}) => {
+        try{
+            const res = await axios.get(`${url}/password/public/${passId}`);
+            return respond(res);
+        }catch(error){
+            return toast(catchErrorMessage)
+        }
+    },
+    editPassword: async(data:CreatePasswordData, passId:string) => {
+        try{
+            const headers = authHeaders()
+            if(!headers) return null;
+            const res = await axios.patch(`${url}/password/${passId}`,{
+                ...data
+            },headers)
+            return respond(res)   
+        }catch(error){
+            return toast(catchErrorMessage)
+        }
+    },
+    deletePassword: async(passId:string) => {
+        try{
+            const headers = authHeaders()
+            if(!headers) return null;
+            const res = await axios.delete(`${url}/password/${passId}`,headers)
+            return respond(res)   
+        }catch(error){
+            return toast(catchErrorMessage)
+        }
+    },
 }

@@ -8,7 +8,6 @@ import { JwtGuard } from "../auth/auth.guard";
 import { ApplyMiddleware } from "src/utils/applyMiddleware.decorator";
 import { User } from "@prisma/client";
 import { EditPasswordDto } from "./dto/edit.input.dto";
-import { PasswordQueryParamsDto } from "./dto/password.queryparams.dto";
 
 @Controller("password")
 @ApiTags("password")
@@ -67,7 +66,7 @@ export class PasswordController{
     edit(
         @Req() req:{user:User},
         @Param('id') passId: string,
-        @Body() payload: EditPasswordDto
+        @Body() payload: CreatePasswordDto
     ){
         return this.passwordService.editPassword(payload,req.user.id, passId)
     }

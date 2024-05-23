@@ -1,4 +1,4 @@
-import {IsNotEmpty, IsOptional, IsString} from "class-validator"
+import {IsBooleanString, IsNotEmpty, IsNumberString, IsOptional, IsString} from "class-validator"
 
 export class CreatePasswordDto {
   
@@ -17,4 +17,13 @@ export class CreatePasswordDto {
   @IsString()
   @IsOptional()
   teamId?: string;
+
+  @IsBooleanString()
+  @IsOptional()
+  public?: string;
+
+  @IsNumberString()
+  @IsOptional()
+  views?:string;
+
 }

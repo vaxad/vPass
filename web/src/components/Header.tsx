@@ -13,7 +13,7 @@ export default function Header({text}:{text:string}) {
         <button onClick={handleBack} className=" p-3 rounded-full border border-slate-50 bg-slate-50 text-zinc-950 hover:bg-zinc-950 hover:text-slate-50 transition-all active:scale-95">
           <ChevronLeftIcon className="w-5 h-5"/>
         </button>
-      <header className=" text-4xl font-extrabold transition-all">{text}</header>
+      <header className=" text-2xl md:text-4xl font-extrabold transition-all">{text}</header>
       </section>
   )
 }

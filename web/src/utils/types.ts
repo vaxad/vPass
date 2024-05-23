@@ -15,6 +15,8 @@ export type CreatePasswordData = {
     groupId: string,
     password: string,
     teamId: string,
+    public: string,
+    views: number
 }
   
 export type User = {

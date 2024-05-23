@@ -19,7 +19,12 @@ export class PasswordService {
             const team = payload.teamId ?
                 await this.prisma.team.findFirst({
                     where: {
-                        id: payload.teamId
+                        id: payload.teamId,
+                        userTeam:{
+                            some:{
+                                userId
+                            }
+                        }
                     }
                 })
                 :
@@ -52,7 +57,9 @@ export class PasswordService {
                     iv,
                     userId: userId,
                     teamId: team.id,
-                    groupId: group.id
+                    groupId: group.id,
+                    public: payload.public?payload.public==="true":false,
+                    views: payload.views?parseInt(payload.views):0
                 },
                 select: {
                     id: true,
@@ -333,7 +340,7 @@ export class PasswordService {
         return { passwords, success: true }
     }
 
-    async editPassword(payload: EditPasswordDto, userId: string, passId: string): Promise<any> {
+    async editPassword(payload: CreatePasswordDto, userId: string, passId: string): Promise<any> {
         if (!userId || !passId) return { success: false, error: "Password not found" };
         const passwordData = await this.prisma.password.findUnique({
             where: {
@@ -352,15 +359,14 @@ export class PasswordService {
         const { encrypted, iv } = payload.password ? encrypt(payload.password) : { encrypted: passwordData.encrypted, iv: passwordData.iv };
         const updatedPasswordData = await this.prisma.password.update({
             where: {
-                id: passId,
-                userId: userId
+                id: passwordData.id,
             },
             data: {
                 name: payload.name ? payload.name : passwordData.name,
                 encrypted,
                 iv,
                 public: payload.public ? payload.public === "true" : passwordData.public,
-                views: payload.views ? payload.views : passwordData.views
+                views: payload.views ? parseInt(payload.views) : passwordData.views
             },
             select: {
                 id: true,
