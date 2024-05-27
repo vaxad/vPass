@@ -45,6 +45,15 @@ export default function AuthChecker() {
         router.replace("/signup")
       }
     }, [path, user])
+
+    async function checkServer(){
+      const res = await apiHandler.check();
+    }
+    
+    useEffect(() => {
+      checkServer()
+    }, [])
+    
     
   return (
     <></>

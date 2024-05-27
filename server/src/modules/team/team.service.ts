@@ -1,11 +1,14 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "nestjs-prisma" 
 import { CreateTeamDto } from "./dto/create.input.dto";
+import { MailerService } from "@nestjs-modules/mailer";
+import { Team, User } from "@prisma/client";
 
 @Injectable()
 export class TeamService {
     constructor(
-        private readonly prisma: PrismaService
+        private readonly prisma: PrismaService, 
+        private readonly mailService: MailerService
     ){}
 
     async createTeam(payload: CreateTeamDto, userId: string):Promise<any>{
@@ -15,6 +18,11 @@ export class TeamService {
                 data:{
                     name: payload.name,
                     userId: userId,
+                }
+            })
+            const user = await this.prisma.user.findFirst({
+                where:{
+                    id:userId
                 }
             })
             const userTeam = await this.prisma.userTeam.create({
@@ -41,6 +49,9 @@ export class TeamService {
                         invited:true,
                         accepted:false
                     }))
+                })
+                payload.members.forEach((member)=>{
+                    this.sendTeamInviteMail(user, member, team)
                 })
             }
             return {success:true, team, group:{...group, team}};
@@ -378,5 +389,93 @@ export class TeamService {
             }
         })
         return {users, success:true}
+    }
+
+    async sendTeamInviteMail(from: User, toId:string, team:Team) {
+        try {
+            const to = await this.prisma.user.findFirst({
+                where:{
+                    id:toId
+                }
+            })
+            await this.mailService.sendMail({
+            from: `${from.username} <${from.email}>`,
+            to: to.email,
+            subject: `${from.username} is inviting you to ${team.name}`,
+            html: `
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Join Our Password Team</title>
+                <style>
+                    body {
+                        font-family: Arial, sans-serif;
+                        background-color: #f4f4f4;
+                        margin: 0;
+                        padding: 0;
+                    }
+                    .container {
+                        max-width: 600px;
+                        margin: 50px auto;
+                        background-color: #ffffff;
+                        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                        border-radius: 8px;
+                        overflow: hidden;
+                    }
+                    .header {
+                        background-color: #007bff;
+                        color: #ffffff;
+                        padding: 20px;
+                        text-align: center;
+                    }
+                    .header h1 {
+                        margin: 0;
+                    }
+                    .content {
+                        padding: 20px;
+                    }
+                    .content p {
+                        font-size: 16px;
+                        line-height: 1.5;
+                    }
+                    .content .team-name {
+                        font-weight: bold;
+                        color: #007bff;
+                    }
+                    .footer {
+                        background-color: #f4f4f4;
+                        padding: 10px;
+                        text-align: center;
+                        font-size: 14px;
+                        color: #666666;
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <div class="header">
+                        <h1>Join Our Password Team <b>${team.name}</b></h1>
+                    </div>
+                    <div class="content">
+                        <p>Hello, <b>${to.username}</b></p>
+                        <p>You've been invited to join the password team from <span class="team-name">${team.name}</span>. By joining, you will get access to all the passwords and groups that belong to this <span class="team-name">${team.name}</span> team.</p>
+                        <p>Click the link below to join now:</p>
+                        <p><a href="https://v-pass.vercel.app/teams/invites" target="_blank">Join Now</a></p>
+                        <p>Thank you,</p>
+                        <p>The <span class="team-name">${team.name}</span> Team</p>
+                    </div>
+                    <div class="footer">
+                        &copy; 2024 <span class="team-name">vPass</span>. All rights reserved.
+                    </div>
+                </div>
+            </body>
+            </html>            
+            `
+            });      
+        } catch (error) {
+           console.log(error)     
+        }
     }
 }

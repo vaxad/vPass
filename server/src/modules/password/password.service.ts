@@ -400,7 +400,7 @@ export class PasswordService {
 
     async deletePassword(userId: string, passId: string): Promise<any> {
         if (!userId || !passId) return { success: false, error: "Password not found" };
-        const passwordData = await this.prisma.password.findUnique({
+        const passwordData = await this.prisma.password.findFirst({
             where: {
                 id: passId,
                 team: {
@@ -416,8 +416,7 @@ export class PasswordService {
         if (!passwordData) return { success: false, error: "Password not found" };
         const deletedPasswordData = await this.prisma.password.delete({
             where: {
-                id: passId,
-                userId: userId
+                id: passId
             }
         })
         return { success: true, password: deletedPasswordData }

@@ -33,6 +33,14 @@ function respond(res:AxiosResponse<any, any>){
 }
 
 export const apiHandler = {
+    check: async() => {
+        try{
+            const res = await axios.get(`${url}`)
+            return toast("Backend is working![we use free servers😅]")
+        }catch(error){
+            return toast("Backend down![we use free servers😅]")
+        }
+    },
     signup: async(data:SignupData) => {
         try{
             const res = await axios.post(`${url}/user/signup`,{
