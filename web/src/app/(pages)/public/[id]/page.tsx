@@ -13,7 +13,7 @@ import { toast } from 'sonner';
 export default function Page({params}:{params:{id:string}}) {
 
     const [show, setShow] = useState(false)
-    const [data, handleChange, changeValue] = useForm<CreatePasswordData>({name:"", password:"", groupId:"", teamId:"", public:"false", views:0}) 
+    const [data, handleChange, changeValue] = useForm<CreatePasswordData>({name:"", password:"", groupId:"", teamId:"", public:"false", views:"0"}) 
     const [loading, setLoading] = useState<boolean>(true)
 
     async function getInitialData(){
