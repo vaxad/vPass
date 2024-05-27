@@ -5,6 +5,12 @@ export type SignupData = {
     cpassword: string,
 }
 
+export type DropdownItem = {
+    name:string,
+    value:string,
+    onClickFn?: ()=>void
+}
+
 export type LoginData = {
     email: string,
     password: string,
@@ -16,7 +22,17 @@ export type CreatePasswordData = {
     password: string,
     teamId: string,
     public: string,
-    views: number
+    views: string
+}
+
+export type CreateTeamData = {
+    name: string,
+    members:string[]
+}
+
+export type CreateGroupData = {
+    name: string,
+    teamId:string
 }
   
 export type User = {

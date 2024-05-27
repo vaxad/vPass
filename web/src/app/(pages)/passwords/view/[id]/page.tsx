@@ -1,5 +1,8 @@
 "use client"
 import AlertComponent from '@/components/AlertComponent';
+import CreateGroupDialog from '@/components/CreateGroupDialog';
+import CreateTeamDialog from '@/components/CreateTeamDialog';
+import Dropdown from '@/components/Dropdown';
 import Header from '@/components/Header'
 import Loader from '@/components/Loader';
 import LoadingScreen from '@/components/LoadingScreen';
@@ -9,7 +12,7 @@ import { apiHandler } from '@/utils/api';
 import { buttonClassNames, buttonDarkClassNames } from '@/utils/constants';
 import context from '@/utils/context/context';
 import { useForm } from '@/utils/hooks/useForm';
-import { CreatePasswordData, Group, Password, Team } from '@/utils/types';
+import { CreatePasswordData, DropdownItem, Group, Password, Team } from '@/utils/types';
 import { CopyIcon, MagicWandIcon, Pencil1Icon, TrashIcon } from '@radix-ui/react-icons';
 import { useRouter } from 'next/navigation';
 import React, { use, useContext, useEffect, useRef, useState } from 'react'
@@ -21,10 +24,12 @@ export default function Page({params}:{params:{id:string}}) {
     const [teams, setTeams] = useState<Team[]>([])
     const [groups, setGroups] = useState<Group[]>([])
     const [show, setShow] = useState(false)
-    const [data, handleChange, changeValue] = useForm<CreatePasswordData>({name:"", password:"", groupId:"", teamId:"", public:"false", views:0}) 
+    const [data, handleChange, changeValue] = useForm<CreatePasswordData>({name:"", password:"", groupId:"", teamId:"", public:"false", views:"0"}) 
     const [loading, setLoading] = useState<boolean>(true)
     const [editMode, setEditMode] = useState(false)
     const router = useRouter()
+    const createTeamBtn = useRef<HTMLButtonElement>(null)
+    const createGroupBtn = useRef<HTMLButtonElement>(null)
 
     async function handleDelete(){
         const res = await apiHandler.deletePassword(params.id)
@@ -46,7 +51,7 @@ export default function Page({params}:{params:{id:string}}) {
         changeValue({name:"teamId", value: passData.password.team.id})
         changeValue({name:"groupId", value: passData.password.group.id})
         changeValue({name:"public", value: passData.password.public?"true":"false"})
-        changeValue({name:"views", value: passData.password.views})
+        changeValue({name:"views", value: passData.password.views.toString()})
         setLoading(false)
         const decrypted = decrypt(passData.password.encrypted, passData.password.iv)
         if(!decrypted)return toast("Password could not be decrypted!")
@@ -78,15 +83,52 @@ export default function Page({params}:{params:{id:string}}) {
         toast("Password copied to clipboard!")
     }
 
+    function addGroup(group:Group){
+        setGroups((prev)=>[...prev, group])
+    }
+
     function handlePublicLink(){
         if(data.public!=="true")return toast("Private passwords cannot have public links!")
-        if(data.views===0)return toast("No public views left!")
+        if(data.views==="0")return toast("No public views left!")
         const url = process.env.NEXT_PUBLIC_FRONTEND_URL
         navigator.clipboard.writeText(`${url}/public/${params.id}`)
         toast(`Public link for password of "${data.name}" copied (views left: ${data.views})`)
     }
-    const visibilityOptions = [{value:"false", name:"Private"}, {value:"true", name:"Public"}]
-    const viewOptions = [...Array(51)].map((_, id)=>id).filter((it)=>it%5===0)
+
+    const teamDropDownData:DropdownItem[] = teams.map((item, idx)=>({name:item.name,value:item.id}))
+    function handleTeamChange(val:string){
+        changeValue({name:"teamId",value:val})
+    }
+    function handleTeamCreate(){
+        createTeamBtn.current?.click()
+
+    }
+    const addTeamBtn: DropdownItem = {name:"Create a new Team +", value:"create", onClickFn:handleTeamCreate}
+
+    const groupDropDownData:DropdownItem[] = groups.filter((item, idx)=>(item.team.id===(data.teamId!==""?data.teamId:teams.length>0?item.team.id===teams[0].id:""))).map((item, idx)=>({name:item.name,value:item.id}))
+    function handleGroupChange(val:string){
+        changeValue({name:"groupId",value:val})
+    }
+    function handleGroupCreate(){
+        createGroupBtn.current?.click()
+    }
+    const addGroupBtn: DropdownItem = {name:"Create a new Group +", value:"create", onClickFn:handleGroupCreate}
+    
+    const visibilityOptions:DropdownItem[] = [{value:"false", name:"Private"}, {value:"true", name:"Public"}]
+    const viewOptions:DropdownItem[] = [...Array(51)].map((_, id)=>id).filter((it)=>it%5===0).map((i)=>({name:i.toString(), value:i.toString()}))
+ 
+    function handleVisibilityChange(val:string){
+        changeValue({name:"public",value:val})
+    }
+
+    function handleViewChange(val:string){
+        changeValue({name:"views",value:val})
+    }
+    
+    function addTeam(team:Team, group:Group){
+        setTeams((prev)=>[...prev, team])
+        setGroups((prev)=>[...prev, group])
+    }
   return loading?(
     <LoadingScreen/>
   ):(
@@ -131,39 +173,46 @@ export default function Page({params}:{params:{id:string}}) {
             <article className=' flex flex-col md:flex-row gap-2 w-full'>
                 <section className=' flex flex-col gap-1 w-full'>
                     <label htmlFor="team">Team</label>
-                    <select disabled={!editMode} defaultValue={data.teamId} className=' w-full px-4 py-2 rounded-md outline-none text-slate-50 bg-zinc-950 focus:bg-slate-50 focus:text-zinc-950 border border-zinc-950 transition-all' name="teamId" id="team-select" onChange={handleChange}>
+                    {/* <select disabled={!editMode} defaultValue={data.teamId} className=' w-full px-4 py-2 rounded-md outline-none text-slate-50 bg-zinc-950 focus:bg-slate-50 focus:text-zinc-950 border border-zinc-950 transition-all' name="teamId" id="team-select" onChange={handleChange}>
                         {teams.map((item, idx) => {
                             return  (
                                 <option key={item.id} value={item.id}>{item.name}</option>
                             )
                         })}
-                    </select>
+                    </select> */}
+                    <Dropdown disabled={!editMode} data={[...teamDropDownData, addTeamBtn]} defaultSelectedItem={data.teamId} handleChange={handleTeamChange} />
+                    <CreateTeamDialog addTeam={addTeam} btn={(<button type='button' title="Add Password" ref={createTeamBtn} className={`hidden ${buttonClassNames} text-2xl  !py-1 !px-4 !h-fit font-extrabold`}>+</button>)}/>
+
                 </section>
                 <section className=' flex flex-col gap-1 w-full'>
                     <label htmlFor="group">Group</label>
-                    <select disabled={!editMode} defaultValue={data.groupId} className=' w-full px-4 py-2 rounded-md outline-none text-slate-50 bg-zinc-950 focus:bg-slate-50 focus:text-zinc-950 border border-zinc-950 transition-all' name="groupId" id="group-select" onChange={handleChange}>
+                    {/* <select disabled={!editMode} defaultValue={data.groupId} className=' w-full px-4 py-2 rounded-md outline-none text-slate-50 bg-zinc-950 focus:bg-slate-50 focus:text-zinc-950 border border-zinc-950 transition-all' name="groupId" id="group-select" onChange={handleChange}>
                         {groups.filter((item, idx)=>(item.team.id===(data.teamId!==""?data.teamId:teams.length>0?item.team.id===teams[0].id:""))).map((item, idx) => {
                                 return  (
                                     <option key={item.id} value={item.id}>{item.name+` (${item.team?.name})`}</option>
                                 )
                             })}
-                    </select>
+                    </select> */}
+                    <Dropdown disabled={!editMode} data={[...groupDropDownData, addGroupBtn]} defaultSelectedItem={data.groupId} handleChange={handleGroupChange} />
+                    <CreateGroupDialog addGroup={addGroup} team={data.teamId} teams={teams} btn={(<button type='button' title="Add Password" ref={createGroupBtn} className={` hidden ${buttonClassNames} text-2xl  !py-1 !px-4 !h-fit font-extrabold`}>+</button>)}/>
+
                 </section>
             </article>
             <article className=' flex flex-col md:flex-row gap-2 w-full'>
                 <section className=' flex flex-col gap-1 w-full'>
                     <label htmlFor="team">Visibility</label>
-                    <select disabled={!editMode} defaultValue={data.public} className=' w-full px-4 py-2 rounded-md outline-none text-slate-50 bg-zinc-950 focus:bg-slate-50 focus:text-zinc-950 border border-zinc-950 transition-all' name="public" id="public-select" onChange={handleChange}>
+                    {/* <select disabled={!editMode} defaultValue={data.public} className=' w-full px-4 py-2 rounded-md outline-none text-slate-50 bg-zinc-950 focus:bg-slate-50 focus:text-zinc-950 border border-zinc-950 transition-all' name="public" id="public-select" onChange={handleChange}>
                         {visibilityOptions.map((item, idx) => {
                             return  (
                                 <option key={idx} value={item.value}>{item.name}</option>
                             )
                         })}
-                    </select>
+                    </select> */}
+                    <Dropdown disabled={!editMode} data={visibilityOptions} defaultSelectedItem={data.public} handleChange={handleVisibilityChange} />
                 </section>
                 <section className=' flex flex-col gap-1 w-full'>
                     <label htmlFor="group">Views</label>
-                    <select defaultValue={data.views} disabled={editMode?data.public!=="true":true} className=' w-full px-4 py-2 rounded-md outline-none text-slate-50 bg-zinc-950 focus:bg-slate-50 focus:text-zinc-950 border border-zinc-950 transition-all' name="views" id="views-select" onChange={handleChange}>
+                    {/* <select defaultValue={data.views} disabled={editMode?data.public!=="true":true} className=' w-full px-4 py-2 rounded-md outline-none text-slate-50 bg-zinc-950 focus:bg-slate-50 focus:text-zinc-950 border border-zinc-950 transition-all' name="views" id="views-select" onChange={handleChange}>
                         {!viewOptions.includes(data.views)?
                             <option value={data.views}>{data.views}</option>
                             :<></>
@@ -173,7 +222,9 @@ export default function Page({params}:{params:{id:string}}) {
                                 <option key={idx} value={item}>{item}</option>
                             )
                         })}
-                    </select>
+                    </select> */}
+                    <Dropdown disabled={editMode?data.public!=="true":true} data={viewOptions.find((i)=>i.value===data.views)?viewOptions:[...viewOptions,{name:data.views, value:data.views}]} defaultSelectedItem={data.views} handleChange={handleViewChange} />
+
                 </section>
             </article>
             {editMode?<button type='submit' className={` ${buttonClassNames} w-full font-semibold text-xl flex justify-center items-center`}>

@@ -15,27 +15,6 @@ export class TeamService {
                 data:{
                     name: payload.name,
                     userId: userId,
-                },
-                select:{
-                    id:true,
-                    name:true,
-                    createdAt:true,
-                    personal:true,
-                    creator:{
-                        select:{
-                            id:true,
-                            email:true,
-                            username:true
-                        }
-                    },
-                    _count:{
-                        select:{
-                            groups:true,
-                            passwords:true,
-                            userTeam:true
-                        }
-                    }
-                    
                 }
             })
             const userTeam = await this.prisma.userTeam.create({
@@ -54,7 +33,17 @@ export class TeamService {
                     default:true
                 }
             })
-            return {success:true, team};
+            if(payload.members && payload.members.length>0){    
+                const members = await this.prisma.userTeam.createMany({
+                    data:payload.members.map((userId)=>({
+                        teamId:team.id,
+                        userId:userId,
+                        invited:true,
+                        accepted:false
+                    }))
+                })
+            }
+            return {success:true, team, group:{...group, team}};
         } catch (error) {
             console.log({error})
             return {success:false, error}

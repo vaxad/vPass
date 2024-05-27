@@ -1,5 +1,5 @@
 import { toast } from "sonner";
-import { CreatePasswordData, LoginData, SignupData } from "./types";
+import { CreateGroupData, CreatePasswordData, CreateTeamData, LoginData, SignupData } from "./types";
 import axios, { AxiosResponse } from "axios"
 
 const url = process.env.NEXT_PUBLIC_API_URL
@@ -163,6 +163,38 @@ export const apiHandler = {
             const headers = authHeaders()
             if(!headers) return null;
             const res = await axios.delete(`${url}/password/${passId}`,headers)
+            return respond(res)   
+        }catch(error){
+            return toast(catchErrorMessage)
+        }
+    },
+    createTeam: async(data:CreateTeamData) => {
+        try{
+            const headers = authHeaders()
+            if(!headers) return null;
+            const res = await axios.post(`${url}/team/`,{
+                ...data
+            },headers)
+            return respond(res)   
+        }catch(error){
+            return toast(catchErrorMessage)
+        }
+    },
+    searchUser: async({term}:{term:string}) => {
+        try{
+            const res = await axios.get(`${url}/user/search/${term}`);
+            return respond(res);
+        }catch(error){
+            return toast(catchErrorMessage)
+        }
+    },
+    createGroup: async(data:CreateGroupData) => {
+        try{
+            const headers = authHeaders()
+            if(!headers) return null;
+            const res = await axios.post(`${url}/group/`,{
+                ...data
+            },headers)
             return respond(res)   
         }catch(error){
             return toast(catchErrorMessage)

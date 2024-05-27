@@ -55,6 +55,13 @@ export class UserController{
         return this.userService.getUser(userId)
     }
 
+    @Get("search/:term")
+    searchUser(
+        @Param("term") term:string
+    ){
+        return this.userService.searchUser(term)
+    }
+
     @Patch("resend")
     @ApplyMiddleware()
     @UseGuards(JwtGuard)
@@ -104,7 +111,6 @@ export class UserController{
     ){
         return this.userService.rejectTeam(teamId,req.user.id)
     }
-
     
 
 }

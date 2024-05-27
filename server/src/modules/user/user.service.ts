@@ -346,4 +346,30 @@ export class UserService {
 
     }
     
+    async searchUser(term:string):Promise<any>{
+        const users = await this.prisma.user.findMany({
+            where:{
+                OR:[
+                    {email:{contains:term, mode:"insensitive"}},
+                    {username:{contains:term, mode:"insensitive"}}
+                ]
+            },
+            select:{
+                id:true,
+                username:true,
+                email:true,
+                createdAt: true,
+                _count:{
+                    select:{
+                        groups:true,
+                        teams:true,
+                        userTeam:true
+                    }
+                }
+            },
+            take:10
+        })
+        return {users, success:true}
+    }
+
 }
