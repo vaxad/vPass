@@ -30,7 +30,7 @@ export default function AuthChecker() {
     }
     async function getUser(){
         const res = await apiHandler.getMe();
-        if(!res||!res.user)removeInvalidToken()
+        if(!res||!res.user)return removeInvalidToken()
         setUser(res.user)
     }
     useEffect(() => {
