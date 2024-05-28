@@ -3,16 +3,14 @@
 import Loader from "@/components/Loader"
 import { apiHandler } from "@/utils/api"
 import { buttonClassNames, trim } from "@/utils/constants"
+import context from "@/utils/context/context"
 import { Password } from "@/utils/types"
 import { ArrowTopRightIcon, Pencil1Icon } from "@radix-ui/react-icons"
 import Link from "next/link"
-import { useEffect, useState } from "react"
+import { useContext, useEffect, useState } from "react"
 
 const PasswordCard = ({item}:{item:Password}) => {
     const [hover, setHover] = useState(false);
-    const handleRegister = async () => {
-           
-    };
     
     return (
         <article onMouseOver={()=>setHover(true)} onMouseLeave={()=>setHover(false)} className={` flex flex-col flex-grow md:flex-row w-full justify-between items-start md:items-center rounded-lg px-4 py-2 bg-slate-50 border border-slate-50 text-zinc-950 hover:bg-zinc-950 hover:text-slate-50 transition-all`} >
@@ -33,7 +31,7 @@ const PasswordCard = ({item}:{item:Password}) => {
                   {/* <Link href={`/passwords/edit/${item.id}`} onClick={handleRegister} className={`${buttonClassNames} border !border-slate-50 !rounded-full !flex-shrink justify-center items-center flex `}>
                       <Pencil1Icon className=" w-6 h-6"/>
                   </Link> */}
-                  <Link href={`/passwords/view/${item.id}`} onClick={handleRegister} className={`${buttonClassNames} border !border-slate-50 !rounded-full !flex-shrink !w-full md:w-fit justify-center items-center flex`}>
+                  <Link href={`/passwords/view/${item.id}`} className={`${buttonClassNames} border !border-slate-50 !rounded-full !flex-shrink !w-full md:w-fit justify-center items-center flex`}>
                       <ArrowTopRightIcon className=" w-6 h-6"/>
                   </Link>
                 </section>
@@ -45,9 +43,11 @@ const PasswordCard = ({item}:{item:Password}) => {
 export default function PasswordSection() {
     const [passwords, setPasswords] = useState<Password[]>([])
     const [loading, setLoading] = useState<boolean>(true)
+    const {selectedGroup, selectedTeam} = useContext(context)
 
     async function getInitialData() {
-        const res = await apiHandler.getPasswordsGeneral({})
+        setLoading(true)
+        const res = await apiHandler.getPasswordsGeneral({groupId:selectedGroup, teamId:selectedTeam})
         if(!res||!res.success)return
         setPasswords(res.passwords)
         setLoading(false)
@@ -55,13 +55,17 @@ export default function PasswordSection() {
     
     useEffect(() => {
       getInitialData()
-    }, [])
+    }, [selectedGroup, selectedTeam])
     
   return loading?(
     <Loader size={200} />
   ):(
     <section className=" flex flex-col gap-4 py-3 w-full">
-        {passwords.map((item, idx)=>{
+        {passwords.length===0?(
+        <article className=" w-full px-6 py-12 justify-center items-center">
+            <h3 className=" text-2xl text-slate-50 font-semibold w-full text-center">No passwords to display!</h3>
+        </article>):
+        passwords.map((item, idx)=>{
             return(
                 <PasswordCard key={`${idx}-password-card`} item={item}/>
             )

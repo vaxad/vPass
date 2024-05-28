@@ -15,7 +15,7 @@ export default function SignOutBtn() {
         router.replace("/")
     }
   return user?(
-    <button onClick={handleSignOut} className={`${buttonClassNames}`}>
+    <button onClick={handleSignOut} className={`${buttonClassNames} flex-nowrap text-nowrap`}>
         Sign Out
     </button>
   ):(
