@@ -20,7 +20,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className + " min-h-screen flex bg-zinc-950 flex-col"}>
+      <body className={inter.className + " min-h-screen flex bg-gradient-to-br from-[#060A13] to-[#000000] flex-col"}>
         <Toaster />
         <StateComponent>
           <AuthChecker/>

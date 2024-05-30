@@ -29,7 +29,7 @@ export default function Page() {
     }
 
   return (
-    <div className=' flex w-full h-full bg-zinc-950 flex-col px-6 md:px-12 py-8'>
+    <div className=' flex w-full h-full flex-col px-6 md:px-12 py-8'>
         <header className=' text-center font-bold text-4xl text-slate-50 py-4'>Sign up to vPass!</header>
         <form onSubmit={handleFormSubmit} className=' flex flex-col gap-2 bg-slate-50 text-zinc-950 p-6 rounded-md border border-slate-600 '>
             <article className=' flex flex-col gap-1 w-full'>

@@ -14,7 +14,7 @@ export default function Loader({size=50}:{size?:number}) {
                     x="2.5"
                     y="2.5"
                     fill="none"
-                    stroke-width={size/10}
+                    strokeWidth={size/10}
                     width={size}
                     height={size}
                 />
@@ -23,7 +23,7 @@ export default function Loader({size=50}:{size?:number}) {
                     x="2.5"
                     y="2.5"
                     fill="none"
-                    stroke-width={size/10}
+                    strokeWidth={size/10}
                     width={size}
                     height={size}
                     pathLength="100"

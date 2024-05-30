@@ -42,7 +42,7 @@ export default function AuthChecker() {
             getUser()
         }
       }else if(!isPublic(path)){
-        router.replace("/signup")
+        router.replace("/auth")
       }
     }, [path, user])
 
