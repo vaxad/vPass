@@ -16,8 +16,8 @@ export default function StateComponent({children}: {children:ReactNode}) {
       const teamData : {success: boolean, teams: Team[]} = await apiHandler.getMyTeams();
       if(!teamData||!teamData.success)return
       setTeams(teamData.teams)
-      // const select = teamData.teams.findIndex((i)=>i.personal&&i.creator.id===user.id)
-      // if(select!==-1)setSelectedTeam(teamData.teams[select].id)
+      const select = teamData.teams.findIndex((i)=>i.personal&&i.creator.id===user.id)
+      if(select!==-1)setSelectedTeam(teamData.teams[select].id)
       const groupData : {success: boolean, groups: Group[]} = await apiHandler.getMyGroups();
       if(!groupData)return
       setGroups(groupData.groups)

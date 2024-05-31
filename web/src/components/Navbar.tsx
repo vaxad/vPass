@@ -28,6 +28,7 @@ export default function Navbar() {
             <Link href={"/passwords"} className=" flex flex-row tracking-tighter text-xl bg-clip-text bg-gradient-to-b from-[#FFFFFF] to-[#999999]  text-transparent ">
                 <strong className=" font-extrabold">V</strong>pass
             </Link>
+            <TeamChanger/>
         </section>
         <section className=" flex flex-row gap-3 justify-center items-center w-fit">            
             {/* <TeamChanger/> */}
