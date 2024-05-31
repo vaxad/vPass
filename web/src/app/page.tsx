@@ -8,7 +8,7 @@ export default function Home() {
       <p className=" text-center">A password manager for all</p>
       <div className=" flex flex-col md:flex-row justify-center items-center gap-4 py-6">
         <a href="https://github.com/vaxad/vPass" target="_blank" className={` ${buttonDarkClassNames} text-center`}>Go to Repo</a>
-        <Link href={'/signup'} className={` ${buttonDarkClassNames} text-center `} >Get Started</Link>
+        <Link href={'/auth'} className={` ${buttonDarkClassNames} text-center `} >Get Started</Link>
       </div>
       </main>
   );

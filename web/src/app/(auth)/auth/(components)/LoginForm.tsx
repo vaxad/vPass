@@ -7,6 +7,7 @@ import { toast } from "sonner"
 import { LuEye, LuEyeOff } from "react-icons/lu";
 import { IoCheckmark } from "react-icons/io5";
 import { RxCross1 } from "react-icons/rx";
+import { buttonClassNames } from '@/utils/constants';
 
 export default function LoginForm({setLogin}:{setLogin:Dispatch<SetStateAction<boolean>>}) {
     const router = useRouter()
@@ -35,20 +36,20 @@ export default function LoginForm({setLogin}:{setLogin:Dispatch<SetStateAction<b
             <article className=' flex flex-col gap-1 '>
                 <label htmlFor="email">Email </label>
                 <div className=' px-4 py-2 rounded-md outline-none text-white bg-black focus-within:bg-white focus-within:text-black border border-[#555555]  transition-all flex flex-row gap-1 items-center'>
-                <input autoComplete='off' required minLength={2} pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}" title='enter a valid email' name='email' className='!bg-transparent  outline-none placeholder:text-[#555555]' type="email" placeholder='joemama@alabama.com' value={data.email} onChange={handleChange}/>
+                <input autoComplete='off' required minLength={2} pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}" title='enter a valid email' name='email' className='!bg-transparent  outline-none placeholder:text-[#555555] w-full' type="email" placeholder='joemama@alabama.com' value={data.email} onChange={handleChange}/>
                 {data.email.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/)?<IoCheckmark className=' w-4 h-4' />:<RxCross1 className=' w-4 h-4' /> }
                 </div>
             </article>
             <article className=' flex flex-col gap-1 '>
                 <label htmlFor="password">Password</label>
                 <div className=' px-4 py-2 rounded-md outline-none text-white bg-black focus-within:bg-white focus-within:text-black border border-[#555555]  transition-all flex flex-row gap-1 items-center'>
-                <input autoComplete='off'  required minLength={8} pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()]).{8,}$" name='password'  className=' bg-transparent outline-none placeholder:text-[#555555]' type={show?"text":"password"} placeholder='JoeMama#1276' value={data.password} onChange={handleChange} />   
+                <input autoComplete='off'  required minLength={8} pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()]).{8,}$" name='password'  className=' bg-transparent outline-none placeholder:text-[#555555] w-full' type={show?"text":"password"} placeholder='JoeMama#1276' value={data.password} onChange={handleChange} />   
                 <button type='button' onClick={()=>{setShow((prev)=>!prev)}}>
                     {!show?<LuEye className=' w-4 h-4'/>:<LuEyeOff className=' w-4 h-4' />}
                 </button>
                 </div>
             </article>
-            <button type='submit' className={` bg-gradient-to-b from-[#0D0F14] to-[#030408] py-2 px-4 w-full rounded-md text-xl font-semibold text-white border border-[#3A3A3A]`}>
+            <button type='submit' className={` ${buttonClassNames} w-full`}>
                 Submit
             </button>
         </form>
