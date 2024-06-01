@@ -18,7 +18,7 @@ export default async function Page() {
       <section className=" flex flex-col w-full ">
         <section className=" py-2 md:py-6 flex flex-row gap-2">
         <Searchbar />
-        <Link href={'/passwords/create'} title="Add Password" className={` ${buttonDarkClassNames} text-2xl font-extrabold`}>+</Link>
+        {/* <Link href={'/passwords/create'} title="Add Password" className={` ${buttonDarkClassNames} text-2xl font-extrabold`}>+</Link> */}
         </section>
         <section>
           <PasswordSection/>

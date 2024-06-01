@@ -9,7 +9,7 @@ import LoadingScreen from '@/components/LoadingScreen';
 import { AlertDialog } from '@/components/ui/alert-dialog';
 import { decrypt } from '@/lib/cipher.utils';
 import { apiHandler } from '@/utils/api';
-import { buttonClassNames, buttonDarkClassNames } from '@/utils/constants';
+import { buttonClassNames, buttonDarkClassNames, trim } from '@/utils/constants';
 import context from '@/utils/context/context';
 import { useForm } from '@/utils/hooks/useForm';
 import { CreatePasswordData, DropdownItem, Group, Password, Team } from '@/utils/types';
@@ -18,219 +18,225 @@ import { useRouter } from 'next/navigation';
 import React, { use, useContext, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner';
 
-export default function Page({params}:{params:{id:string}}) {
-    const {user} = useContext(context)
+export default function Page({ params }: { params: { id: string } }) {
+    const { user } = useContext(context)
 
     const [teams, setTeams] = useState<Team[]>([])
     const [groups, setGroups] = useState<Group[]>([])
     const [show, setShow] = useState(false)
-    const [data, handleChange, changeValue] = useForm<CreatePasswordData>({name:"", password:"", groupId:"", teamId:"", public:"false", views:"0"}) 
+    const [data, handleChange, changeValue] = useForm<CreatePasswordData>({ name: "", password: "", groupId: "", teamId: "", public: "false", views: "0" })
     const [loading, setLoading] = useState<boolean>(true)
     const [editMode, setEditMode] = useState(false)
     const router = useRouter()
     const createTeamBtn = useRef<HTMLButtonElement>(null)
     const createGroupBtn = useRef<HTMLButtonElement>(null)
 
-    async function handleDelete(){
+    async function handleDelete() {
         const res = await apiHandler.deletePassword(params.id)
-        if(!res||!res.success) return
+        if (!res || !res.success) return
         toast("Password deleted successfully!")
         router.replace("/passwords")
     }
 
-    async function getInitialData(){
-        const passData : {success: boolean, password: Password} = await apiHandler.getPasswordById({passId:params.id})
-        if(!passData||!passData.success)return
-        const teamData : {success: boolean, teams: Team[]} = await apiHandler.getMyTeams();
-        if(!teamData||!teamData.success)return
+    async function getInitialData() {
+        const passData: { success: boolean, password: Password } = await apiHandler.getPasswordById({ passId: params.id })
+        if (!passData || !passData.success) return
+        const teamData: { success: boolean, teams: Team[] } = await apiHandler.getMyTeams();
+        if (!teamData || !teamData.success) return
         setTeams(teamData.teams)
         const groupData = await apiHandler.getMyGroups();
-        if(!groupData)return
+        if (!groupData) return
         setGroups(groupData.groups)
-        changeValue({name:"name", value: passData.password.name})
-        changeValue({name:"teamId", value: passData.password.team.id})
-        changeValue({name:"groupId", value: passData.password.group.id})
-        changeValue({name:"public", value: passData.password.public?"true":"false"})
-        changeValue({name:"views", value: passData.password.views.toString()})
+        changeValue({ name: "name", value: passData.password.name })
+        changeValue({ name: "teamId", value: passData.password.team.id })
+        changeValue({ name: "groupId", value: passData.password.group.id })
+        changeValue({ name: "public", value: passData.password.public ? "true" : "false" })
+        changeValue({ name: "views", value: passData.password.views.toString() })
         setLoading(false)
         const decrypted = decrypt(passData.password.encrypted, passData.password.iv)
-        if(!decrypted)return toast("Password could not be decrypted!")
-        changeValue({name:"password", value: decrypted})
+        if (!decrypted) return toast("Password could not be decrypted!")
+        changeValue({ name: "password", value: decrypted })
     }
 
     useEffect(() => {
-      getInitialData()
+        getInitialData()
     }, [])
 
     useEffect(() => {
-      if(data.teamId==="")return
-      const reqGrp = groups.find((val, idx)=> (val.team.id===data.teamId && val.default))
-      if(!reqGrp) return
-      changeValue({name:"groupId", value:reqGrp.id})
+        if (data.teamId === "") return
+        const reqGrp = groups.find((val, idx) => (val.team.id === data.teamId && val.default))
+        if (!reqGrp) return
+        changeValue({ name: "groupId", value: reqGrp.id })
     }, [data.teamId, groups])
-    
-    async function handleFormSubmit(e:React.FormEvent<HTMLFormElement>) {
+
+    async function handleFormSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
         setEditMode(false)
-        if(!editMode) return
+        if (!editMode) return
         const res = await apiHandler.editPassword(data, params.id)
-        if(!res)return
+        if (!res) return
         toast(`Successfully edited password for ${data.name}!`)
     }
-    
-    function handleCopy(){
+
+    function handleCopy() {
         navigator.clipboard.writeText(data.password)
         toast("Password copied to clipboard!")
     }
 
-    function addGroup(group:Group){
-        setGroups((prev)=>[...prev, group])
+    function addGroup(group: Group) {
+        setGroups((prev) => [...prev, group])
     }
 
-    function handlePublicLink(){
-        if(data.public!=="true")return toast("Private passwords cannot have public links!")
-        if(data.views==="0")return toast("No public views left!")
+    function handlePublicLink() {
+        if (data.public !== "true") return toast("Private passwords cannot have public links!")
+        if (data.views === "0") return toast("No public views left!")
         const url = process.env.NEXT_PUBLIC_FRONTEND_URL
         navigator.clipboard.writeText(`${url}/public/${params.id}`)
         toast(`Public link for password of "${data.name}" copied (views left: ${data.views})`)
     }
 
-    const teamDropDownData:DropdownItem[] = teams.map((item, idx)=>({name:item.name,value:item.id}))
-    function handleTeamChange(val:string){
-        changeValue({name:"teamId",value:val})
+    const teamDropDownData: DropdownItem[] = teams.map((item, idx) => ({ name: item.name, value: item.id }))
+    function handleTeamChange(val: string) {
+        changeValue({ name: "teamId", value: val })
     }
-    function handleTeamCreate(){
+    function handleTeamCreate() {
         createTeamBtn.current?.click()
 
     }
-    const addTeamBtn: DropdownItem = {name:"Create a new Team +", value:"create", onClickFn:handleTeamCreate}
+    const addTeamBtn: DropdownItem = { name: "Create a new Team +", value: "create", onClickFn: handleTeamCreate }
 
-    const groupDropDownData:DropdownItem[] = groups.filter((item, idx)=>(item.team.id===(data.teamId!==""?data.teamId:teams.length>0?item.team.id===teams[0].id:""))).map((item, idx)=>({name:item.name,value:item.id}))
-    function handleGroupChange(val:string){
-        changeValue({name:"groupId",value:val})
+    const groupDropDownData: DropdownItem[] = groups.filter((item, idx) => (item.team.id === (data.teamId !== "" ? data.teamId : teams.length > 0 ? item.team.id === teams[0].id : ""))).map((item, idx) => ({ name: item.name, value: item.id }))
+    function handleGroupChange(val: string) {
+        changeValue({ name: "groupId", value: val })
     }
-    function handleGroupCreate(){
+    function handleGroupCreate() {
         createGroupBtn.current?.click()
     }
-    const addGroupBtn: DropdownItem = {name:"Create a new Group +", value:"create", onClickFn:handleGroupCreate}
-    
-    const visibilityOptions:DropdownItem[] = [{value:"false", name:"Private"}, {value:"true", name:"Public"}]
-    const viewOptions:DropdownItem[] = [...Array(51)].map((_, id)=>id).filter((it)=>it%5===0).map((i)=>({name:i.toString(), value:i.toString()}))
- 
-    function handleVisibilityChange(val:string){
-        changeValue({name:"public",value:val})
+    const addGroupBtn: DropdownItem = { name: "Create a new Group +", value: "create", onClickFn: handleGroupCreate }
+
+    const visibilityOptions: DropdownItem[] = [{ value: "false", name: "Private" }, { value: "true", name: "Public" }]
+    const viewOptions: DropdownItem[] = [...Array(51)].map((_, id) => id).filter((it) => it % 5 === 0).map((i) => ({ name: i.toString(), value: i.toString() }))
+
+    function handleVisibilityChange(val: string) {
+        changeValue({ name: "public", value: val })
     }
 
-    function handleViewChange(val:string){
-        changeValue({name:"views",value:val})
+    function handleViewChange(val: string) {
+        changeValue({ name: "views", value: val })
     }
-    
-    function addTeam(team:Team, group:Group){
-        setTeams((prev)=>[...prev, team])
-        setGroups((prev)=>[...prev, group])
+
+    function addTeam(team: Team, group: Group) {
+        setTeams((prev) => [...prev, team])
+        setGroups((prev) => [...prev, group])
     }
-  return loading?(
-    <LoadingScreen/>
-  ):(
-    <div className=' flex flex-col gap-6 px-6 md:px-12 lg:px-24 py-12 bg-zinc-950 text-slate-50'>
-        <section className=' flex flex-col gap-2 md:flex-row w-full justify-between'>
-        <Header text={`${editMode?"Edit":"View"} a password`}/>
-        <section className=' flex flex-row w-full md:w-fit gap-1'>
-        <button onClick={handlePublicLink} title='Get public link' className={`${buttonDarkClassNames} !p-2 !md:w-fit !w-full flex justify-center items-center`}>
-            <MagicWandIcon className='w-6 h-6'/>
-        </button>
-        <button onClick={()=>{setEditMode((m)=>!m)}} title='Edit this password' className={`${buttonDarkClassNames} !p-2 !md:w-fit !w-full flex justify-center items-center`}>
-            <Pencil1Icon className='w-6 h-6'/>
-        </button>
-        <AlertComponent  title='Are you sure?' description={`This will delete the password for "${data.name}"`} onAction={handleDelete} trigger={
-            (
-            <button title='Delete this password' className={`${buttonDarkClassNames} !p-2 !md:w-fit !w-full flex justify-center items-center`}>
-                <TrashIcon className='w-6 h-6'/>
-            </button>
-            )
-        } />
-        </section>
-            
-        </section>
-        <form onSubmit={handleFormSubmit} className=' flex flex-col gap-2 bg-slate-50 text-zinc-950 p-3 md:p-6 rounded-md border border-slate-600 '>
-            <article className=' flex flex-col gap-1 w-full'>
-                <label htmlFor="name">Name</label>
-                <input disabled={!editMode} required minLength={3} name='name' className=' w-full px-4 py-2 rounded-md outline-none text-slate-50 bg-zinc-950 focus:bg-slate-50 focus:text-zinc-950 border border-zinc-950 transition-all' type="text" placeholder='ATM PIN' value={data.name} onChange={handleChange} />
-            </article>
-            <article className=' flex flex-col gap-1 w-full'>
-                <label htmlFor="password">Password</label>
-                <section className=' flex flex-row gap-1 w-full'>
-                    <input disabled={!editMode} required minLength={1} name='password'  className=' w-full px-4 py-2 rounded-md outline-none text-slate-50 bg-zinc-950 focus:bg-slate-50 focus:text-zinc-950 border border-zinc-950 transition-all' type={show?"text":"password"} placeholder='49620' value={data.password} onChange={handleChange} />
-                    <button onClick={handleCopy} title='Copy this password' className={`${buttonClassNames} !p-2`}>
-                        <CopyIcon className='w-6 h-6'/>
+
+    const team = teams.find((i) => i.id === data.teamId)
+    const group = groups.find((i) => i.id === data.groupId)
+
+    return loading ? (
+        <LoadingScreen />
+    ) : (
+        <div className=' flex flex-col justify-center items-center gap-6 px-6 md:px-12 lg:px-24 py-12  text-slate-50'>
+            <section className='w-full md:w-[45vw] lg:w-[35vw] flex flex-col'>
+            <section className=' flex flex-col gap-2 md:flex-row justify-between'>
+                {/* <Header text={`${editMode?"Edit":"View"} a password`}/> */}
+                <section className=' flex flex-col gap-2'>
+                    <section className=' flex flex-row gap-2'>
+                        <div className=" w-1 rounded-full flex flex-grow bg-[#00A3FF]"></div>
+                        <header className=" text-2xl md:text-4xl font-bold transition-all">{data.name}</header>
+                    </section>
+                    <section className=" flex flex-row items-center py-4">
+                        <div className={`py-1 px-3 text-sm text-nowrap shrink rounded-full font-normal bg-white bg-opacity-[17%] text-white transition-all`}>
+                            <h3 className=" ">{trim(team ? team.name : "Team", 24)}</h3>
+                        </div>
+                        <div className=" bg-[#444444] w-6 h-0.5">
+                        </div>
+                        <div className={`py-1 px-3 text-sm text-nowrap shrink rounded-full font-normal bg-[#00A3FF] bg-opacity-[27%] text-[#00A3FF] transition-all`}>
+                            <h3>{trim(group ? group.name : "Group", 24)}</h3>
+                        </div>
+                    </section>
+                </section>
+
+                <section className=' flex flex-row h-fit w-full md:w-fit gap-1'>
+                    <button onClick={handlePublicLink} title='Get public link' className={`${buttonDarkClassNames} !p-2 !md:w-fit !w-full flex justify-center items-center`}>
+                        <MagicWandIcon className='w-6 h-6' />
                     </button>
+                    <button onClick={() => { setEditMode((m) => !m) }} title='Edit this password' className={`${buttonDarkClassNames} !p-2 !md:w-fit !w-full flex justify-center items-center`}>
+                        <Pencil1Icon className='w-6 h-6' />
+                    </button>
+                    <AlertComponent title='Are you sure?' description={`This will delete the password for "${data.name}"`} onAction={handleDelete} trigger={
+                        (
+                            <button title='Delete this password' className={`${buttonDarkClassNames} !p-2 !md:w-fit !w-full flex justify-center items-center`}>
+                                <TrashIcon className='w-6 h-6' />
+                            </button>
+                        )
+                    } />
                 </section>
-                <div className=' flex flex-row gap-1  py-1 justify-start items-center'>
-                    <input type="checkbox" className=' accent-black h-4 w-4' value={show?"checked":"unchecked"} onChange={(e)=>{setShow((prev)=>!prev)}} />
-                    <h3 className=' text-xs'>Show password</h3>
-                </div>
-            </article>
-            <article className=' flex flex-col md:flex-row gap-2 w-full'>
-                <section className=' flex flex-col gap-1 w-full'>
-                    <label htmlFor="team">Team</label>
-                    {/* <select disabled={!editMode} defaultValue={data.teamId} className=' w-full px-4 py-2 rounded-md outline-none text-slate-50 bg-zinc-950 focus:bg-slate-50 focus:text-zinc-950 border border-zinc-950 transition-all' name="teamId" id="team-select" onChange={handleChange}>
-                        {teams.map((item, idx) => {
-                            return  (
-                                <option key={item.id} value={item.id}>{item.name}</option>
-                            )
-                        })}
-                    </select> */}
-                    <Dropdown disabled={!editMode} data={[...teamDropDownData, addTeamBtn]} defaultSelectedItem={data.teamId} handleChange={handleTeamChange} />
-                    <CreateTeamDialog addTeam={addTeam} btn={(<button type='button' title="Add Password" ref={createTeamBtn} className={`hidden ${buttonClassNames} text-2xl  !py-1 !px-4 !h-fit font-extrabold`}>+</button>)}/>
 
-                </section>
-                <section className=' flex flex-col gap-1 w-full'>
-                    <label htmlFor="group">Group</label>
-                    {/* <select disabled={!editMode} defaultValue={data.groupId} className=' w-full px-4 py-2 rounded-md outline-none text-slate-50 bg-zinc-950 focus:bg-slate-50 focus:text-zinc-950 border border-zinc-950 transition-all' name="groupId" id="group-select" onChange={handleChange}>
-                        {groups.filter((item, idx)=>(item.team.id===(data.teamId!==""?data.teamId:teams.length>0?item.team.id===teams[0].id:""))).map((item, idx) => {
-                                return  (
-                                    <option key={item.id} value={item.id}>{item.name+` (${item.team?.name})`}</option>
-                                )
-                            })}
-                    </select> */}
-                    <Dropdown disabled={!editMode} data={[...groupDropDownData, addGroupBtn]} defaultSelectedItem={data.groupId} handleChange={handleGroupChange} />
-                    <CreateGroupDialog addGroup={addGroup} team={data.teamId} teams={teams} btn={(<button type='button' title="Add Password" ref={createGroupBtn} className={` hidden ${buttonClassNames} text-2xl  !py-1 !px-4 !h-fit font-extrabold`}>+</button>)}/>
+            </section>
+            <div  className=' flex flex-row gap-5  p-3 md:p-6 rounded-md  w-full'>
+                <section>
+                <article className=' flex flex-col gap-1 w-full'>
+                    <label htmlFor="password">Password</label>
+                    <section className=' flex flex-row gap-1 w-full'>
+                        <input disabled={!editMode} required minLength={1} name='password' className=' w-full px-4 py-2 rounded-md outline-none text-slate-50 bg-zinc-950 focus:bg-slate-50 focus:text-zinc-950 border border-zinc-950 transition-all' type={show ? "text" : "password"} placeholder='49620' value={data.password} onChange={handleChange} />
+                        <button onClick={handleCopy} title='Copy this password' className={`${buttonClassNames} !p-2`}>
+                            <CopyIcon className='w-6 h-6' />
+                        </button>
+                    </section>
+                    <div className=' flex flex-row gap-1  py-1 justify-start items-center'>
+                        <input type="checkbox" className=' accent-black h-4 w-4' value={show ? "checked" : "unchecked"} onChange={(e) => { setShow((prev) => !prev) }} />
+                        <h3 className=' text-xs'>Show password</h3>
+                    </div>
+                </article>
+                <article className=' flex flex-col  gap-2 w-full'>
+                    <section className=' flex flex-col gap-1 w-full'>
+                        <label htmlFor="team">Team</label>
+                       
+                        <Dropdown className='!w-full' disabled={!editMode} data={[...teamDropDownData, addTeamBtn]} defaultSelectedItem={data.teamId} handleChange={handleTeamChange} />
+                        <CreateTeamDialog addTeam={addTeam} btn={(<button type='button' title="Add Password" ref={createTeamBtn} className={`hidden ${buttonClassNames} text-2xl  !py-1 !px-4 !h-fit font-extrabold`}>+</button>)} />
 
-                </section>
-            </article>
-            <article className=' flex flex-col md:flex-row gap-2 w-full'>
-                <section className=' flex flex-col gap-1 w-full'>
-                    <label htmlFor="team">Visibility</label>
-                    {/* <select disabled={!editMode} defaultValue={data.public} className=' w-full px-4 py-2 rounded-md outline-none text-slate-50 bg-zinc-950 focus:bg-slate-50 focus:text-zinc-950 border border-zinc-950 transition-all' name="public" id="public-select" onChange={handleChange}>
-                        {visibilityOptions.map((item, idx) => {
-                            return  (
-                                <option key={idx} value={item.value}>{item.name}</option>
-                            )
-                        })}
-                    </select> */}
-                    <Dropdown disabled={!editMode} data={visibilityOptions} defaultSelectedItem={data.public} handleChange={handleVisibilityChange} />
-                </section>
-                <section className=' flex flex-col gap-1 w-full'>
-                    <label htmlFor="group">Views</label>
-                    {/* <select defaultValue={data.views} disabled={editMode?data.public!=="true":true} className=' w-full px-4 py-2 rounded-md outline-none text-slate-50 bg-zinc-950 focus:bg-slate-50 focus:text-zinc-950 border border-zinc-950 transition-all' name="views" id="views-select" onChange={handleChange}>
-                        {!viewOptions.includes(data.views)?
-                            <option value={data.views}>{data.views}</option>
-                            :<></>
-                        }
-                        {viewOptions.map((item, idx) => {
-                            return  (
-                                <option key={idx} value={item}>{item}</option>
-                            )
-                        })}
-                    </select> */}
-                    <Dropdown disabled={editMode?data.public!=="true":true} data={viewOptions.find((i)=>i.value===data.views)?viewOptions:[...viewOptions,{name:data.views, value:data.views}]} defaultSelectedItem={data.views} handleChange={handleViewChange} />
+                    </section>
+                    <section className=' flex flex-col gap-1 w-full'>
+                        <label htmlFor="group">Group</label>
+                    
+                        <Dropdown className='!w-full' disabled={!editMode} data={[...groupDropDownData, addGroupBtn]} defaultSelectedItem={data.groupId} handleChange={handleGroupChange} />
+                        <CreateGroupDialog addGroup={addGroup} team={data.teamId} teams={teams} btn={(<button type='button' title="Add Password" ref={createGroupBtn} className={` hidden ${buttonClassNames} text-2xl  !py-1 !px-4 !h-fit font-extrabold`}>+</button>)} />
 
+                    </section>
+                </article>
+                
                 </section>
-            </article>
-            {editMode?<button type='submit' className={` ${buttonClassNames} w-full font-semibold text-xl flex justify-center items-center`}>
-                {"Edit"}
-            </button>:<></>}
-        </form>
-    </div>
-  )
+                <section>
+                <article className=' flex flex-col gap-2 w-full'>
+                    <section className=' flex flex-col gap-1 w-full'>
+                        <label htmlFor="team">Visibility</label>
+                        
+                        <Dropdown className='!w-full' disabled={!editMode} data={visibilityOptions} defaultSelectedItem={data.public} handleChange={handleVisibilityChange} />
+                    </section>
+                    <section className=' flex flex-col gap-1 w-full'>
+                        <label htmlFor="group">Views</label>
+                       
+                        <Dropdown className='!w-full' disabled={editMode ? data.public !== "true" : true} data={viewOptions.find((i) => i.value === data.views) ? viewOptions : [...viewOptions, { name: data.views, value: data.views }]} defaultSelectedItem={data.views} handleChange={handleViewChange} />
+
+                    </section>
+                    <section className=' w-full'>
+                    <AlertComponent title='Are you sure?' description={`This will delete the password for "${data.name}"`} onAction={handleDelete} trigger={
+                        (
+                            <button title='Delete this password' className={`${buttonDarkClassNames} !px-4 !py-2 !w-full text-[#950000] !bg-transparent border border-[#670000] flex flex-row gap-2 hover:text-[#950000] active:text-[#950000] justify-center items-center`}>
+                                <TrashIcon className='w-6 h-6' />
+                                <h3>Delete Permanently</h3>
+                            </button>
+                        )
+                    } />
+                    </section>
+                </article>
+                </section>
+                {editMode ? <button type='submit' className={` ${buttonClassNames} w-full font-semibold text-xl flex justify-center items-center`}>
+                    {"Edit"}
+                </button> : <></>}
+            </div>
+            </section>
+        </div>
+    )
 }
