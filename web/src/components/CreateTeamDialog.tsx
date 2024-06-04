@@ -18,14 +18,21 @@ import { useRouter } from "next/navigation"
 import context from "@/utils/context/context"
 
 const defaultButton = (<button className={`${buttonDarkClassNames}`}>Create</button>)
-export default function CreateTeamDialog({ btn = defaultButton, addTeam }: { btn: React.JSX.Element, addTeam : (team:Team, group:Group) => void }) {
-  const {user} = useContext(context)
+export default function CreateTeamDialog({ btn = defaultButton }: { btn: React.JSX.Element }) {
+  const {user, setTeams, setGroups} = useContext(context)
   const [data, handleChange, changeValue] = useForm<CreateTeamData>({ name: "", members: [] })
   const [term, setTerm] = useState("")
   const [focused, setFocused] = useState(false)
   const [users, setUsers] = useState<User[]>([])
+  const [selectedUsers, setSelectedUsers] = useState<User[]>([])
   const closeRef = useRef<HTMLButtonElement>(null)
   const router = useRouter();
+
+  function addTeam(team: Team, group: Group) {
+    setTeams((prev) => [...prev, team])
+    setGroups((prev) => [...prev, group])
+}
+
   function handleDelete(id:string){
     const filteredUsers = data.members.filter((i)=>i!==id)
     changeValue({name:"members", value:filteredUsers})
@@ -40,6 +47,26 @@ export default function CreateTeamDialog({ btn = defaultButton, addTeam }: { btn
     handleSearch(term)
   }, [term])
 
+  useEffect(() => {
+    setSelectedUsers((selectedUsers)=>{
+      // const userSet = new Set([...users, ...selectedUsers])
+      // console.log({userSet})
+      // const userSetArray: User[] = Array.from(userSet)
+      // console.log({userSetArray})
+      // return userSetArray.filter((i) => data.members.includes(i.id))
+      const reducedArr = [...users, ...selectedUsers].reduce((prev, curr) => {
+        if (prev.some(elem => elem.id === curr.id)){
+              return prev
+          } else {
+          return [...prev, curr]
+        }
+      }, [] as User[])
+      return reducedArr.filter((i) => data.members.includes(i.id))
+    }
+  )
+  }, [data.members])
+  
+
   async function handleFormSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     e.stopPropagation();
@@ -49,7 +76,8 @@ export default function CreateTeamDialog({ btn = defaultButton, addTeam }: { btn
     addTeam(res.team, res.group)
     closeRef.current?.click()
   }
-  const selectedUsers = users.filter((i) => data.members.includes(i.id))
+  // let selectedUsers : User[] = [];
+  // selectedUsers = [...users, ...selectedUsers].filter((i) => data.members.includes(i.id))
   function handleTermChange(e: React.ChangeEvent<HTMLInputElement>) {
     setTerm(e.target.value)
     setFocused(true)
@@ -60,8 +88,19 @@ export default function CreateTeamDialog({ btn = defaultButton, addTeam }: { btn
     changeValue({ name: "members", value: [...data.members, item.id] })
     setFocused(false)
   }
+
+  useEffect(() => {
+    console.log(data.members)
+  }, [data.members])
+  
+
+  function clearData(e:boolean){
+    if(e)return
+    changeValue({name:"name", value:""})
+    changeValue({name:"members", value:[]})
+  }
   return (
-    <Dialog>
+    <Dialog onOpenChange={clearData}>
       <DialogTrigger>
         {btn}
       </DialogTrigger>
@@ -99,12 +138,12 @@ export default function CreateTeamDialog({ btn = defaultButton, addTeam }: { btn
               })}
             </section>
           </article>
-          <article className=" flex flex-row flex-wrap gap-1">
+          <article className=" flex flex-col flex-wrap gap-1">
             {selectedUsers.map((item, idx) => {
               return (
-                <div key={`selected-user-${idx}`} className=" px-3 py-2 rounded-sm bg-zinc-950 text-slate-50 flex flex-row gap-1">
+                <div key={`selected-user-${idx}`} className=" px-3 py-2 rounded-sm bg-zinc-950 text-slate-50 flex flex-row justify-between items-center gap-1">
                   <h4>{item.email}</h4>
-                  <button onClick={()=>{handleDelete(item.id)}}>
+                  <button type="button" onClick={()=>{handleDelete(item.id)}}>
                     <Cross1Icon className=" w-3 h-3" />
                   </button>
                 </div>
@@ -115,7 +154,7 @@ export default function CreateTeamDialog({ btn = defaultButton, addTeam }: { btn
             Submit
           </button>
         </form>
-      <DialogClose className="hidden" ref={closeRef}></DialogClose>
+      <DialogClose onClick={()=>console.log("hii")} className="hidden" ref={closeRef}></DialogClose>
       </DialogContent>
     </Dialog>
   )

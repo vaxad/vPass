@@ -19,8 +19,8 @@ import context from "@/utils/context/context"
 import Dropdown from "./Dropdown"
 
 const defaultButton = (<button className={`${buttonDarkClassNames}`}>Create</button>)
-export default function CreateGroupDialog({ btn = defaultButton, team, teams, addGroup }: { btn: React.JSX.Element, team:string, teams:Team[], addGroup : (group:Group) => void }) {
-  const {user} = useContext(context)
+export default function CreateGroupDialog({ btn = defaultButton, team, teams }: { btn: React.JSX.Element, team:string, teams:Team[] }) {
+  const {user, setGroups} = useContext(context)
   const [data, handleChange, changeValue] = useForm<CreateGroupData>({ name: "", teamId:team })
   const [term, setTerm] = useState("")
   const [focused, setFocused] = useState(false)
@@ -37,6 +37,9 @@ export default function CreateGroupDialog({ btn = defaultButton, team, teams, ad
     handleSearch(term)
   }, [term])
 
+  function addGroup(group: Group) {
+    setGroups((prev) => [...prev, group])
+}
   async function handleFormSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     e.stopPropagation();
@@ -46,8 +49,13 @@ export default function CreateGroupDialog({ btn = defaultButton, team, teams, ad
     addGroup(res.group)
     closeRef.current?.click()
   }
+  function clearData(e:boolean){
+    if(e)return
+    changeValue({name:"name", value:""})
+    changeValue({name:"teamId", value:""})
+  }
   return (
-    <Dialog>
+    <Dialog onOpenChange={clearData}>
       <DialogTrigger>
         {btn}
       </DialogTrigger>

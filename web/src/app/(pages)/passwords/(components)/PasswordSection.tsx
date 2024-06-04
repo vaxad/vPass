@@ -21,7 +21,7 @@ const PasswordCard = ({item}:{item:Password}) => {
     }
 
     return (
-        <article onMouseOver={()=>setHover(true)} onMouseLeave={()=>setHover(false)} style={{backgroundImage:"linear-gradient(180deg, transparent 9%, hsl(0,0%,49%,7%) 100%)"}} className={` flex flex-col flex-grow md:flex-row w-full h-full justify-between items-start  rounded-lg p-5 border border-[#1F1F1F] hover:border-[#001B7B] transition-all`} >
+        <article onMouseOver={()=>setHover(true)} onMouseLeave={()=>setHover(false)} style={{backgroundImage:"linear-gradient(180deg, transparent 9%, hsl(0,0%,49%,7%) 100%)"}} className={` flex flex-col flex-grow md:flex-row w-full h-full justify-between items-start  rounded-lg p-5 border border-[#1F1F1F] hover:border-[#001B7B] transition-all hover:shadow-[0_9px_27px_0px_hsl(0,0,0,100%)]`} >
             <section className=" flex flex-col h-full gap-1">
                 <h2 className=" font-bold  text-3xl bg-clip-text bg-gradient-to-b from-[#FFFFFF] to-[hsl(0,0%,100%,42%)]  text-transparent  ">{item.name}</h2>
                 {/* <h4>Created: {(new Date(item.createdAt)).toLocaleString()}</h4> */}
@@ -38,12 +38,12 @@ const PasswordCard = ({item}:{item:Password}) => {
                 </section>
                 <h4 className=" text-[#696969] text-xs">Created at: {(new Date(item.createdAt)).toLocaleString()}</h4>          
             </section>
-            <div className="flex flex-col min-h-full w-fit gap-1 justify-between">
+            <div className="flex flex-row md:flex-col min-h-fit md:min-h-full w-full pt-4 md:pt-0 md:w-fit gap-1 justify-between">
                   <button onClick={handlePublicLink} className={` w-fit p-2 self-end flex justify-center items-center aspect-square rounded-lg bg-[#1E1E1E] text-[#A5A5A5] `}>
                       <Share1Icon className=" w-4 h-4"/>
                   </button>
-                  <Link href={`/passwords/view/${item.id}`} className={`bg-[#06EAF9] bg-opacity-15 rounded-full text-white flex flex-row gap-2 justify-center items-center w-fit py-1 px-3`}>
-                    <h4 className=" text-sm">View Password</h4>
+                  <Link href={`/passwords/view/${item.id}`} className={`bg-[#06EAF9] bg-opacity-15 rounded-full text-white flex flex-row gap-2 h-fit justify-center items-center w-fit py-1 px-3`}>
+                    <h4 className=" text-sm text-nowrap">View Password</h4>
                       <ArrowTopRightIcon className=" w-4 h-4"/>
                   </Link>
             </div>
@@ -72,12 +72,7 @@ export default function PasswordSection() {
     <Loader size={200} />
   ):(
     <section className=" gap-4 py-3 grid grid-cols-1 md:grid-cols-2  w-full">
-        {passwords.length===0?(
-        <article className=" w-full col-span-1 md:col-span-3 px-6 py-12 justify-center items-center">
-            <h3 className=" text-2xl text-slate-50 font-semibold w-full text-center">No passwords to display!</h3>
-        </article>):
-        <>
-        <Link href={"/passwords/create"} style={{backgroundImage:"linear-gradient(180deg, transparent 9%, hsl(0,0%,49%,7%) 100%)"}} className=" cursor-pointer active:scale-95 w-full h-full rounded-lg border border-[#4B4B4B] text-[#4B4B4B] hover:text-[#001B7B] hover:border-[#001B7B] transition-all flex justify-center items-center flex-col">
+        <Link href={"/passwords/create"} style={{backgroundImage:"linear-gradient(180deg, transparent 9%, hsl(0,0%,49%,7%) 100%)"}} className=" cursor-pointer active:scale-95 py-8 w-full h-full hover:shadow-[0_9px_27px_0px_hsl(0,0,0,100%)] rounded-lg border border-[#4B4B4B] text-[#4B4B4B] hover:text-[#001B7B] hover:border-[#001B7B] transition-all flex justify-center items-center flex-col">
             <PlusIcon className=" w-8 h-8" />
             <h2 className=" font-medium">Create New</h2>
         </Link>
@@ -86,7 +81,6 @@ export default function PasswordSection() {
                 <PasswordCard key={`${idx}-password-card`} item={item}/>
             )
         })}
-        </>}
     </section>
   )
 }

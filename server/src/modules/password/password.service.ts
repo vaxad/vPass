@@ -366,7 +366,9 @@ export class PasswordService {
                 encrypted,
                 iv,
                 public: payload.public ? payload.public === "true" : passwordData.public,
-                views: payload.views ? parseInt(payload.views) : passwordData.views
+                views: payload.views ? parseInt(payload.views) : passwordData.views,
+                teamId:payload.teamId? payload.teamId : passwordData.teamId,
+                groupId:payload.groupId? payload.groupId : passwordData.groupId
             },
             select: {
                 id: true,
