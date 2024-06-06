@@ -99,8 +99,8 @@ export default function Page() {
         <section className=' flex flex-col gap-2 md:flex-row justify-between'>
             {/* <Header text={`${editMode?"Edit":"View"} a password`}/> */}
             <section className=' flex flex-col gap-2'>
-                <section className=' flex flex-row w-full gap-2'>
-                    <div className=" min-w-1 h-full rounded-full flex flex-grow bg-[#00A3FF]"></div>
+                <section className=' flex  items-center flex-row w-full gap-2'>
+                    <div className=" min-w-1 max-w-1 min-h-8 h-full rounded-full flex flex-grow bg-[#00A3FF]"></div>
                     <input required value={data.name} placeholder='ATM pin' name='name' onChange={handleChange} className=" text-2xl outline-none bg-transparent underline decoration-[#00A3FF] md:text-4xl font-bold transition-all" />
                 </section>
                 <section className=" flex flex-row items-center py-2 md:py-4">
@@ -206,11 +206,11 @@ export default function Page() {
                     </section>
                     
                 </article>
-                {
-                <div className=' w-full py-5'>
+                <div className=' w-full py-5 md:flex hidden'>
                 <button type='submit' className={` ${buttonClassNames} w-full`}>
                         Create
-                    </button> </div>}
+                    </button> 
+                </div>
             </section>
             <section className=' w-full md:w-2/5 h-fit p-4 rounded-lg border border-[#3E3E3E] flex flex-col'>
                 <article className=' flex flex-col gap-2 w-full'>
@@ -247,9 +247,11 @@ export default function Page() {
                 </article>
                 {/* <p className='  test p-6 '>hii</p> */}
             </section>
-            {/* {editMode ? <button type='submit' className={` ${buttonClassNames} w-full font-semibold text-xl flex justify-center items-center`}>
-            {"Edit"}
-        </button> : <></>} */}
+            <div className=' w-full py-5 md:hidden flex'>
+                <button type='submit' className={` ${buttonClassNames} w-full`}>
+                        Create
+                    </button> 
+                </div>
         
         </div>
         

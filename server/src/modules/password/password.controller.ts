@@ -125,6 +125,16 @@ export class PasswordController{
         return this.passwordService.getPassword(req.user.id, passId)
     }
 
+    @Get("search/:term")
+    @ApplyMiddleware()
+    @UseGuards(JwtGuard)
+    search(
+        @Req() req:{user:User},
+        @Param('term') searchTerm: string
+    ){
+        return this.passwordService.searchPassword({userId:req.user.id, searchTerm})
+    }
+
     @Get("public/:id")
     getPublic(
         @Param('id') passId: string

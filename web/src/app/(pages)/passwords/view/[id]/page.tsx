@@ -298,9 +298,9 @@ export default function Page({ params }: { params: { id: string } }) {
                     <section className=' w-full md:w-2/5 h-fit p-4 rounded-lg border border-[#3E3E3E] flex flex-col'>
                         <article className=' flex flex-col gap-2 w-full'>
                             <section className=' flex flex-row gap-2 items-center'>
-                                <div className=' p-2 rounded-md bg-[#1E1E1E] text-[#A5A5A5]'>
+                                <button onClick={handlePublicLink} className=' p-2 rounded-md bg-[#1E1E1E] text-[#A5A5A5]'>
                                     <Share1Icon className=' w-4 h-4' />
-                                </div>
+                                </button>
                                 <h2 className=' text-white text-ls font-medium'>Sharing Options</h2>
                             </section>
 

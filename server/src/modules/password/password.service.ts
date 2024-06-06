@@ -300,6 +300,66 @@ export class PasswordService {
         return { passwords, success: true }
     }
 
+    async searchPassword({ userId, searchTerm }: { userId: string, searchTerm: string }) {
+        // passwordQueryParams = Object.assign(new PasswordQueryParamsDto(), passwordQueryParams)
+        if (!userId) return { success: false, error: "User not found" };
+        // console.log(passwordQueryParams)
+        // let whereQuery:{teamId?:string, groupId?:string, public?:boolean} = passwordQueryParams.teamId!==""?{teamId:passwordQueryParams.teamId}:{}
+        // whereQuery= passwordQueryParams.groupId!==""?{...whereQuery, groupId:passwordQueryParams.groupId}:whereQuery
+
+        const passwords = await this.prisma.password.findMany({
+            where: {
+                name:{contains:searchTerm, mode:"insensitive"},
+                team:{
+                    userTeam:{
+                        some:{
+                            userId,
+                            accepted:true
+                        }
+                    }
+                }
+            },
+            select: {
+                id: true,
+                name: true,
+                createdAt: true,
+                public: true,
+                views: true,
+                team: {
+                    select: {
+                        id: true,
+                        name: true,
+                        _count:{
+                            select:{
+                                userTeam:{
+                                    where:{
+                                        accepted:true
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                user: {
+                    select: {
+                        id: true,
+                        email: true,
+                        username: true
+                    }
+                },
+                group: {
+                    select: {
+                        id: true,
+                        name: true
+                    }
+                },
+                
+
+            },
+        })
+        return { passwords, success: true }
+    }
+
     async getAllMy(userId: string) {
         if (!userId) return { success: false, error: "User not found" };
         const passwords = await this.prisma.password.findMany({

@@ -208,4 +208,14 @@ export const apiHandler = {
             return toast(catchErrorMessage)
         }
     },
+    searchPasswords: async({searchTerm}:{searchTerm:string}) => {
+        try{
+            const headers = authHeaders()
+            if(!headers) return null;
+            const res = await axios.get(`${url}/password/search/${searchTerm}`,headers);
+            return respond(res);
+        }catch(error){
+            return toast(catchErrorMessage)
+        }
+    }
 }
