@@ -6,14 +6,13 @@ import React, { Dispatch, SetStateAction, useState } from 'react'
 import { toast, font, setLocalItem } from '@/utils/constants';
 import AntDesign from "@expo/vector-icons/AntDesign";
 import Entypo from "@expo/vector-icons/Entypo";
-import { buttonClassNames } from '@/utils/constants';
 import { Text, TextInput, TouchableOpacity, View } from 'react-native';
 import GradientButton from '@/components/GradientButton';
 import { LinearGradient } from 'expo-linear-gradient';
 
 export default function SignupForm({ setLogin }: { setLogin: Dispatch<SetStateAction<boolean>> }) {
     const router = useRouter()
-    const [show, setShow] = useState(false)
+    const [show, setShow] = useState(true)
     const [data, handleChange, changeValue] = useForm<SignupData>({
         email: "",
         password: "",

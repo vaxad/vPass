@@ -13,7 +13,8 @@ type ContextType = {
     setSelectedGroup: Dispatch<SetStateAction<string>>,
     toasts: string[],
     setToasts: Dispatch<SetStateAction<string[]>>,
+    toast: (text:string)=>void
 }
-const context = createContext<ContextType>({ user: null, setUser: () => { }, teams: [], setTeams: () => { }, groups: [], setGroups: () => { }, selectedGroup: "", setSelectedGroup: () => { }, selectedTeam: "", setSelectedTeam: () => { }, toasts:[], setToasts: () => {} })
+const context = createContext<ContextType>({ user: null, setUser: () => { }, teams: [], setTeams: () => { }, groups: [], setGroups: () => { }, selectedGroup: "", setSelectedGroup: () => { }, selectedTeam: "", setSelectedTeam: () => { }, toasts:[], setToasts: () => {}, toast: (text:string) => {} })
 
 export default context

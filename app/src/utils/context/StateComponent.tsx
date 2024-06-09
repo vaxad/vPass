@@ -7,10 +7,10 @@ export default function StateComponent({children}: {children:ReactNode}) {
     const [user, setUser] = useState<User|null>(null)
     const [teams, setTeams] = useState<Team[]>([])
     const [groups, setGroups] = useState<Group[]>([])
-    const [toasts, setToasts] = useState<string[]>(["Hii","1 toast","2toast"])
+    const [toasts, setToasts] = useState<string[]>(["test"])
     const [selectedGroup, setSelectedGroup] = useState("")
     const [selectedTeam, setSelectedTeam] = useState("")
-
+    
     async function getInitialData(){
       if(!user)return
       const teamData : {success: boolean, teams: Team[]} = await apiHandler.getMyTeams();
@@ -33,15 +33,20 @@ export default function StateComponent({children}: {children:ReactNode}) {
     useEffect(() => {
       setSelectedGroup("")
     }, [selectedTeam])
-    
 
     useEffect(() => {
       if(!user)return resetData()
       getInitialData()
     }, [user])
+
+    function toast(text:string){
+      if(!text.trim().length)return
+      setToasts((prev) => [...prev, text.trim()])
+      console.info(text)
+  }
     
   return (
-    <context.Provider value={{user, setUser, groups, setGroups, teams, setTeams, selectedGroup,  selectedTeam, setSelectedGroup, setSelectedTeam, toasts, setToasts}}>
+    <context.Provider value={{user, setUser, groups, setGroups, teams, setTeams, selectedGroup,  selectedTeam, setSelectedGroup, setSelectedTeam, toasts, setToasts, toast}}>
         {children}
     </context.Provider>
   )

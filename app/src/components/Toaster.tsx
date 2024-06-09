@@ -1,34 +1,49 @@
 import { View, Text, TextStyle, ViewStyle, ImageStyle } from 'react-native'
-import React, { useContext } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { font } from '@/utils/constants'
 import * as Animatable from 'react-native-animatable';
-import context from '@/utils/context/context';
+import useStore from '@/utils/zustand/store';
+import { Toast, ToastBgColor, ToastTextColor } from '@/utils/types';
 
-const Toast = ({item, idx}:{item:string, idx:number}) => {
-    const from : TextStyle & ViewStyle & ImageStyle = {
-        opacity:0,
-        translateY: 100
-    }
-    const to : TextStyle & ViewStyle & ImageStyle = {
-        opacity:1,
-        translateY: 0 
-    }
+const from : TextStyle & ViewStyle & ImageStyle = {
+    opacity:0,
+    translateY: 100
+}
+const to : TextStyle & ViewStyle & ImageStyle = {
+    opacity:1,
+    translateY: 0 
+}
+
+
+const ToastComponent = ({item, idx}:{item:Toast, idx:number}) => {
+
+    const [anim, setAnim] = useState({from:from, to:to})
+    
+    useEffect(() => {
+      setTimeout(()=>{
+        setAnim({from:to, to:from})
+      }, 3000)
+    }, [])
+
+    const bgClr = ToastBgColor[item.type]
+    const textClr = ToastTextColor[item.type]
+    
 
 return(
-    <Animatable.View duration={1000}  animation={{ easing:"ease-in-out-cubic", from:from, to:to }} style={{marginBottom:4*idx}} className=' absolute bottom-0 right-0 py-3 px-6 w-full rounded-lg bg-white border border-slate-500 '>
-        <Text style={{...font.medium}} className='!text-black text-xl'>{item}</Text>
+    <Animatable.View duration={1000}  animation={{ easing:"ease-in-out-cubic", ...anim }} style={{marginBottom:4*(idx%4), backgroundColor:bgClr}} className=' absolute bottom-0 right-0 py-3 px-6 w-full rounded-lg  border border-slate-500 ' >
+        <Text style={{...font.medium, color:textClr}} className=' text-xl'>{item.message}</Text>
     </Animatable.View>
 )
 }
 
 const Toaster = () => {
-    const {toasts} = useContext(context)
+    const {toasts} = useStore()
   return (
     <View className=' absolute bottom-0 pointer-events-none right-0 w-full p-5 flex justify-center items-center'>
         <View className=' w-full relative flex flex-col gap-2'>
-            {toasts.slice(toasts.length-4,toasts.length).map((item, idx)=>{
+            {toasts.map((item, idx)=>{
                 return  (
-                    <Toast item={item} idx={idx} key={`toast-${idx}`}  />
+                    <ToastComponent item={item} idx={idx} key={`toast-${idx}`}  />
                 )
             })}
         </View>

@@ -1,6 +1,6 @@
 import SignOutBtn from "@/components/SignOutBtn";
 import context from "@/utils/context/context";
-import { LinearGradient } from "expo-linear-gradient";
+import useStore from "@/utils/zustand/store";
 import { Link } from "expo-router";
 import React, { useContext } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
@@ -20,7 +20,7 @@ export default function Page() {
 
 function Content() {
 
-  const {setToasts} = useContext(context)
+  const {toast} = useStore()
   return (
     <View className="flex-1">
       <View className="py-12 md:py-24 lg:py-32 xl:py-48">
@@ -36,12 +36,7 @@ function Content() {
               Discover and collaborate on amce. Explore our services now.
             </Text>
 
-            <TouchableOpacity onPress={()=>{
-              console.log("hii")
-              setToasts((prev)=>{
-              console.log([...prev,`${prev.length} toast`])
-              return [...prev,`${prev.length} toast`]
-              })}} className="gap-4">
+            <TouchableOpacity onPress={()=>{toast({message:"HII", type:"ERROR"})}} className="gap-4">
               <Text
                 className=" text-white"
               >

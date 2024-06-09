@@ -1,13 +1,16 @@
 // import { toast } from "sonner";
-import { deployedBackendUrl, localBackendUrl, toast } from "./constants";
+
+import { deployedBackendUrl, localBackendUrl } from "./constants";
 import { CreateGroupData, CreatePasswordData, CreateTeamData, LoginData, SignupData } from "./types";
 import axios, { AxiosResponse } from "axios"
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import useStore from "./zustand/store";
+
 
 const url = deployedBackendUrl
 const catchErrorMessage = "Unauthorised!"
 const noAuthTokenErrorMessage = "Please login or signup!"
-
+const {toast} = useStore.getState()
 async function authHeaders(){
     const token = await AsyncStorage.getItem("token");
     if(!token) {

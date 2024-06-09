@@ -114,3 +114,21 @@ export type UserTeam = {
     team:      Team,         
     createdAt: Date,    
 }
+
+export type ToastType = "NORMAL" | "WARNING" | "ERROR"
+export type Toast = {
+    message: string,
+    type: ToastType
+}
+
+export const ToastBgColor:Record<ToastType, string> = {
+    "ERROR":"red",
+    "NORMAL":"white",
+    "WARNING":"yellow"
+}
+
+export const ToastTextColor:Record<ToastType, string> = {
+    "ERROR":"white",
+    "NORMAL":"black",
+    "WARNING":"black"
+}

@@ -2,6 +2,9 @@
 // styles
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useContext } from "react";
+import context from "./context/context";
+import useStore from "./zustand/store";
 
 export const buttonClassNames = " py-2 px-4 rounded-md text-xl font-semibold text-white border border-[#3A3A3A] active:scale-95 transition-all"
 
@@ -13,6 +16,8 @@ export const trim = (text:string, length:number=8) => {
     return text.length<=length?text:text.slice(0,length)+"..."
 }
 
+const {toast:sendToast} = useStore.getState()
+export const toast = sendToast;
 export function generateRandomColor() {
     const red = Math.floor(Math.random() * 200); 
     const green = Math.floor(Math.random() * 200);
@@ -34,10 +39,6 @@ export const font = {
     black : {fontFamily:"SpaceGrotesk_900Black", color:"white"}
 }
 
-export function toast(text:string){
-    console.info(text)
-}
-
 export async function setLocalItem(name:string, value:string){
     await AsyncStorage.setItem(name, value)
 }
@@ -52,5 +53,4 @@ export async function removeLocalItem(name:string){
 }
 
 export const localBackendUrl = "https://zbsz21km-5000.inc1.devtunnels.ms"
-export const deployedBackendUrl = "https://vpass.onrender.com"
-
+export const deployedBackendUrl = "https://vpass.onrender.com" 

@@ -12,7 +12,7 @@ import GradientButton from '@/components/GradientButton';
 
 export default function LoginForm({ setLogin }: { setLogin: Dispatch<SetStateAction<boolean>> }) {
     const router = useRouter()
-    const [show, setShow] = useState(false)
+    const [show, setShow] = useState(true)
     const [data, handleChange, changeValue] = useForm<LoginData>({
         email: "",
         password: ""
