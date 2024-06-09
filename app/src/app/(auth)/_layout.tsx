@@ -24,6 +24,9 @@ export default function Layout() {
         tabBarStyle: {
           display: 'none',
         },
+        contentStyle:{
+          backgroundColor:"transparent"
+        },
         animation: "fade_from_bottom"
       })}
       />

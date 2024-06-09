@@ -2,8 +2,8 @@ import { apiHandler } from "@/utils/api"
 import context from "@/utils/context/context"
 import { usePathname, useRouter } from "expo-router"
 import { useContext, useEffect } from "react"
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { User } from "@/utils/types";
+import { getLocalItem, removeLocalItem } from "@/utils/constants";
 
 export default function AuthChecker() {
     const path = usePathname()
@@ -21,12 +21,12 @@ export default function AuthChecker() {
         }
     }
     async function getToken(){
-        const token =  await AsyncStorage.getItem("token")
+        const token =  await getLocalItem("token")
         return token
     }
     async function removeInvalidToken(){
-        const token =  await AsyncStorage.getItem("token")
-        if(token) await AsyncStorage.removeItem("token")
+        const token =  await getLocalItem("token")
+        if(token) await removeLocalItem("token")
     }
     async function getUser(){
         const res = await apiHandler.getMe();
@@ -45,7 +45,7 @@ export default function AuthChecker() {
             await getUser()
         }
       }else if(!isPublic(path)){
-        router.replace("/signup")
+        router.replace("/auth")
       }
     }
 

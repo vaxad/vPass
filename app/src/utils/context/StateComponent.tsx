@@ -7,6 +7,7 @@ export default function StateComponent({children}: {children:ReactNode}) {
     const [user, setUser] = useState<User|null>(null)
     const [teams, setTeams] = useState<Team[]>([])
     const [groups, setGroups] = useState<Group[]>([])
+    const [toasts, setToasts] = useState<string[]>(["Hii","1 toast","2toast"])
     const [selectedGroup, setSelectedGroup] = useState("")
     const [selectedTeam, setSelectedTeam] = useState("")
 
@@ -40,7 +41,7 @@ export default function StateComponent({children}: {children:ReactNode}) {
     }, [user])
     
   return (
-    <context.Provider value={{user, setUser, groups, setGroups, teams, setTeams, selectedGroup,  selectedTeam, setSelectedGroup, setSelectedTeam}}>
+    <context.Provider value={{user, setUser, groups, setGroups, teams, setTeams, selectedGroup,  selectedTeam, setSelectedGroup, setSelectedTeam, toasts, setToasts}}>
         {children}
     </context.Provider>
   )

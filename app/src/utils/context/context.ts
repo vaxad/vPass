@@ -11,7 +11,9 @@ type ContextType = {
     setSelectedTeam: Dispatch<SetStateAction<string>>,
     selectedGroup: string,
     setSelectedGroup: Dispatch<SetStateAction<string>>,
+    toasts: string[],
+    setToasts: Dispatch<SetStateAction<string[]>>,
 }
-const context = createContext<ContextType>({ user: null, setUser: () => { }, teams: [], setTeams: () => { }, groups: [], setGroups: () => { }, selectedGroup: "", setSelectedGroup: () => { }, selectedTeam: "", setSelectedTeam: () => { } })
+const context = createContext<ContextType>({ user: null, setUser: () => { }, teams: [], setTeams: () => { }, groups: [], setGroups: () => { }, selectedGroup: "", setSelectedGroup: () => { }, selectedTeam: "", setSelectedTeam: () => { }, toasts:[], setToasts: () => {} })
 
 export default context

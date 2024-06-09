@@ -1,20 +1,26 @@
 import SignOutBtn from "@/components/SignOutBtn";
+import context from "@/utils/context/context";
+import { LinearGradient } from "expo-linear-gradient";
 import { Link } from "expo-router";
-import React from "react";
-import { Text, View } from "react-native";
+import React, { useContext } from "react";
+import { Text, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function Page() {
   return (
-    <View className="flex flex-1">
+    // <LinearGradient colors={['#FFFFFF', '#000000']} start={{x:0,y:0}} end={{x:1, y:1}} className=' w-full  flex flex-col ' style={{ height: "100%", display: "flex", flexDirection: "column" }}>
+    <View className="flex flex-1 ">
       <Header />
       <Content />
       <Footer />
     </View>
+    // </LinearGradient>
   );
 }
 
 function Content() {
+
+  const {setToasts} = useContext(context)
   return (
     <View className="flex-1">
       <View className="py-12 md:py-24 lg:py-32 xl:py-48">
@@ -30,15 +36,18 @@ function Content() {
               Discover and collaborate on amce. Explore our services now.
             </Text>
 
-            <View className="gap-4">
-              <Link
-                suppressHighlighting
-                className="flex h-9 items-center justify-center overflow-hidden rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-gray-50 web:shadow ios:shadow transition-colors hover:bg-gray-900/90 active:bg-gray-400/90 web:focus-visible:outline-none web:focus-visible:ring-1 focus-visible:ring-gray-950 disabled:pointer-events-none disabled:opacity-50 dark:bg-gray-50 dark:text-gray-900 dark:hover:bg-gray-50/90 dark:focus-visible:ring-gray-300"
-                href="/login"
+            <TouchableOpacity onPress={()=>{
+              console.log("hii")
+              setToasts((prev)=>{
+              console.log([...prev,`${prev.length} toast`])
+              return [...prev,`${prev.length} toast`]
+              })}} className="gap-4">
+              <Text
+                className=" text-white"
               >
                 Explore
-              </Link>
-            </View>
+              </Text>
+            </TouchableOpacity>
           </View>
         </View>
       </View>

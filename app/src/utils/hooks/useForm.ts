@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 
-type UseFormReturn<T> = [T, (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void, ({ name, value }: {name: string; value: any;}) => void ];
+type UseFormReturn<T> = [T, (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void, ({ name, value }: {name: keyof T; value: any;}) => void ];
 
 export function useForm<T>(initialState: T): UseFormReturn<T> {
     const [values, setValues] = useState(initialState);
     
-    const changeValue = ({name, value} : {name:string, value:any}) => {
+    const changeValue = ({name, value} : {name:keyof T, value:any}) => {
       setValues(
         (prev) =>   
         ({

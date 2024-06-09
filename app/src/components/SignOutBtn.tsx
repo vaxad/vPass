@@ -1,8 +1,7 @@
 "use client"
 
-import { buttonClassNames, font } from "@/utils/constants"
+import { buttonClassNames, font, removeLocalItem } from "@/utils/constants"
 import context from "@/utils/context/context"
-import AsyncStorage from "@react-native-async-storage/async-storage"
 import { Link } from "expo-router"
 import { useRouter } from "expo-router"
 import { useContext } from "react"
@@ -13,7 +12,7 @@ export default function SignOutBtn() {
     const {user, setUser} = useContext(context)
     async function handleSignOut(){
         setUser(null)
-        await AsyncStorage.removeItem("token")
+        await removeLocalItem("token")
         router.replace("/")
     }
   return user?(

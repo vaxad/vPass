@@ -1,7 +1,9 @@
 
 // styles
 
-export const buttonClassNames = "py-2 px-4 rounded-lg bg-zinc-950 text-slate-50 border border-zinc-950 hover:bg-slate-50 focus:bg-slate-50 hover:text-zinc-950 focus:text-zinc-950 transition-all font-semibold active:scale-90"
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+export const buttonClassNames = " py-2 px-4 rounded-md text-xl font-semibold text-white border border-[#3A3A3A] active:scale-95 transition-all"
 
 export const buttonDarkClassNames = " py-2 px-4 rounded-lg hover:bg-zinc-950 focus:bg-zinc-950 hover:text-slate-50 focus:text-slate-50 border border-slate-50 bg-slate-50 text-zinc-950 transition-all font-semibold active:scale-90"
 
@@ -24,16 +26,29 @@ export function generateRandomColor() {
 }
 
 export const font = {
-    bold : {fontFamily:"SpaceGrotesk_700Bold"},
-    regular : {fontFamily:"SpaceGrotesk_400Regular"},
-    medium : {fontFamily:"SpaceGrotesk_500Medium"},
-    semiBold : {fontFamily:"SpaceGrotesk_600SemiBold"},
-    extraBold : {fontFamily:"SpaceGrotesk_800ExtraBold"},
-    black : {fontFamily:"SpaceGrotesk_900Black"}
+    bold : {fontFamily:"SpaceGrotesk_700Bold", color:"white"},
+    regular : {fontFamily:"SpaceGrotesk_400Regular", color:"white"},
+    medium : {fontFamily:"SpaceGrotesk_500Medium", color:"white"},
+    semiBold : {fontFamily:"SpaceGrotesk_600SemiBold", color:"white"},
+    extraBold : {fontFamily:"SpaceGrotesk_800ExtraBold", color:"white"},
+    black : {fontFamily:"SpaceGrotesk_900Black", color:"white"}
 }
 
 export function toast(text:string){
     console.info(text)
+}
+
+export async function setLocalItem(name:string, value:string){
+    await AsyncStorage.setItem(name, value)
+}
+
+export async function getLocalItem(name:string){
+    const value = await AsyncStorage.getItem(name)
+    return value;
+}
+
+export async function removeLocalItem(name:string){
+    await AsyncStorage.removeItem(name)
 }
 
 export const localBackendUrl = "https://zbsz21km-5000.inc1.devtunnels.ms"
