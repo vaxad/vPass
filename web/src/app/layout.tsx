@@ -11,6 +11,12 @@ const inter = Space_Grotesk({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "vPass",
   description: "V just pass your passwords",
+  keywords: ["password", "manager", "vpass", "vaxad", "v-pass", "vpass vaxad", "Vpass"],
+  applicationName: "vPass",
+  authors: { name: "vaxad", url: "https://github.com/vaxad" },
+  category: "password manager",
+  creator: "vaxad",
+  publisher: "vaxad"
 };
 
 export default function RootLayout({
@@ -23,7 +29,7 @@ export default function RootLayout({
       <body className={inter.className + " min-h-screen flex bg-gradient-to-br from-[#060A13] to-[#000000] flex-col"}>
         <Toaster />
         <StateComponent>
-          <AuthChecker/>
+          <AuthChecker />
           <Navbar />
           {children}
         </StateComponent>

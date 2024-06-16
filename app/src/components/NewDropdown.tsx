@@ -27,7 +27,7 @@ export default function Dropdown({ data, defaultSelectedItem, handleChange, disa
                     <Text style={font.regular} className="hidden md:flex font-medium text-sm md:pr-0 pr-2 ">{selectedItem ? selectedItem.name : "Loading your teams"}</Text>
                     <Text style={font.regular} className="flex md:hidden font-medium text-sm md:pr-0 pr-2 ">{selectedItem ? trim(selectedItem.name, 25) : "Loading"}</Text>
                     <Text style={font.regular} className=" hidden md:flex py-0.5 px-2 rounded-full bg-[#54565c] text-white text-xs font-medium">Team</Text>
-                    <View className=" flex flex-col flex-grow h-full w-fit bg-[rgba(255,255,255,0.15)] rounded-md text-[#9A9A9A] ">
+                    <View className=" flex flex-col flex-grow justify-center items-center w-fit bg-[rgba(255,255,255,0.15)] rounded-md text-[#9A9A9A] ">
                         <View className=" ">
                             <MaterialIcons name="keyboard-arrow-up" color={"#9A9A9A"} className=" w-4 h-4" />
                         </View>
@@ -38,22 +38,34 @@ export default function Dropdown({ data, defaultSelectedItem, handleChange, disa
                 </TouchableOpacity>
             </LinearGradient>
             <View className={`w-fit ${className}`}>
-                {open ? <View className=" absolute top-2  right-0  bg-white  rounded-md flex flex-col p-2 " style={{ zIndex: 10000, width: 200, height: 500 }}>
-                    {title ? <Text style={font.regular} className=" !text-xs !py-1 px-4 !text-gray-600">{title}</Text> : <></>}
-                    <FlatList
-                        data={data}
-                        scrollEnabled={true}
-                        // style={{ flexGrow: 0 }}
-                        renderItem={({ item, index: idx },) => (
-                            <TouchableOpacity className={` text-sm py-2 px-2  ${item.value === defaultSelectedItem ? "text-white" : ""} ${item.onClickFn ? " " : ""}`} onPress={() => item.onClickFn ? item.onClickFn() : handleSelect(idx)}>
-                                <Text style={font.regular} className=" !text-black"> {item.name}</Text>
-                            </TouchableOpacity>
-                        )}
-                        keyExtractor={(item, ind) => ind.toString()}
-                    />
-                </View> : <></>}
+                {open ?
+                    <View className="absolute top-2  right-0" style={{ width: 300 }}>
+                        <ScrollView scrollEnabled={true} showsVerticalScrollIndicator contentContainerStyle={{ height: 400 }} className="  bg-white  rounded-md flex flex-col p-2 " style={{ zIndex: 10000, flex: 1, height: "100%", overflow: "visible" }} >
+                            {title ? <Text style={font.regular} className=" !text-xs !py-1 px-4 !text-gray-600">{title}</Text> : <></>}
+                            {/* <FlatList
+                            data={data}
+                            scrollEnabled={false}
+                            style={{ flexGrow: 1 }}
+                            showsVerticalScrollIndicator
+                            renderItem={({ item, index: idx },) => (
+                                <TouchableOpacity className={` text-sm py-2 px-2  ${item.value === defaultSelectedItem ? "text-white" : ""} ${item.onClickFn ? " " : ""}`} onPress={() => item.onClickFn ? item.onClickFn() : handleSelect(idx)}>
+                                    <Text style={font.regular} className=" !text-black"> {item.name}</Text>
+                                </TouchableOpacity>
+                            )}
+                            keyExtractor={(item, ind) => ind.toString()}
+                        /> */}
+                            {[...data, ...data].map((item, idx) => {
+                                return (
+                                    <TouchableOpacity key={`team-${idx}`} className={` text-sm py-2 px-2  ${item.value === defaultSelectedItem ? "text-white" : ""} ${item.onClickFn ? " " : ""}`} onPress={() => item.onClickFn ? item.onClickFn() : handleSelect(idx)}>
+                                        <Text style={font.regular} className=" !text-black"> {item.name}</Text>
+                                    </TouchableOpacity>
+                                )
+                            })}
+                        </ScrollView>
+                    </View>
+                    : <></>}
             </View>
-        </View>
+        </View >
 
     )
 }
