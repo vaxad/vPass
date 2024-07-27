@@ -39,37 +39,38 @@ export default function Page({ params }: { params: { id: string } }) {
         router.replace("/passwords")
     }
 
-    async function getInitialData() {
-        const passData: { success: boolean, password: Password } = await apiHandler.getPasswordById({ passId: params.id })
-        if (!passData || !passData.success) return
-        setOgData(passData.password)
-        // const teamData: { success: boolean, teams: Team[] } = await apiHandler.getMyTeams();
-        // if (!teamData || !teamData.success) return
-        // setTeams(teamData.teams)
-        // const groupData = await apiHandler.getMyGroups();
-        // if (!groupData) return
-        // setGroups(groupData.groups)
-        changeValue({ name: "name", value: passData.password.name })
-        changeValue({ name: "teamId", value: passData.password.team.id })
-        changeValue({ name: "groupId", value: passData.password.group.id })
-        changeValue({ name: "public", value: passData.password.public ? "true" : "false" })
-        changeValue({ name: "views", value: passData.password.views.toString() })
-        setLoading(false)
-        const decrypted = decrypt(passData.password.encrypted, passData.password.iv)
-        if (!decrypted) return toast("Password could not be decrypted!")
-        changeValue({ name: "password", value: decrypted })
-    }
-
     useEffect(() => {
+
+        async function getInitialData() {
+            const passData: { success: boolean, password: Password } = await apiHandler.getPasswordById({ passId: params.id })
+            if (!passData || !passData.success) return
+            setOgData(passData.password)
+            // const teamData: { success: boolean, teams: Team[] } = await apiHandler.getMyTeams();
+            // if (!teamData || !teamData.success) return
+            // setTeams(teamData.teams)
+            // const groupData = await apiHandler.getMyGroups();
+            // if (!groupData) return
+            // setGroups(groupData.groups)
+            changeValue({ name: "name", value: passData.password.name })
+            changeValue({ name: "teamId", value: passData.password.team.id })
+            changeValue({ name: "groupId", value: passData.password.group.id })
+            changeValue({ name: "public", value: passData.password.public ? "true" : "false" })
+            changeValue({ name: "views", value: passData.password.views.toString() })
+            setLoading(false)
+            const decrypted = decrypt(passData.password.encrypted, passData.password.iv)
+            if (!decrypted) return toast("Password could not be decrypted!")
+            changeValue({ name: "password", value: decrypted })
+        }
+
         getInitialData()
-    }, [])
+    }, [changeValue, setLoading, params.id])
 
     useEffect(() => {
         if (data.teamId === "") return
         const reqGrp = groups.find((val, idx) => (val.team.id === data.teamId && val.default))
         if (!reqGrp) return
         changeValue({ name: "groupId", value: reqGrp.id })
-    }, [data.teamId, groups])
+    }, [data.teamId, groups, changeValue])
 
     async function handleFormSubmit() {
         // e.preventDefault();
@@ -268,7 +269,7 @@ export default function Page({ params }: { params: { id: string } }) {
                                         </button>} */}
                                 </div>
                                 {editMode ?
-                                    <><Dropdown className='!w-full' disabled={!editMode} data={[addTeamBtn,...teamDropDownData]} defaultSelectedItem={data.teamId} handleChange={handleTeamChange} />
+                                    <><Dropdown className='!w-full' disabled={!editMode} data={[addTeamBtn, ...teamDropDownData]} defaultSelectedItem={data.teamId} handleChange={handleTeamChange} />
                                         <CreateTeamDialog btn={(<button type='button' title="Add Password" ref={createTeamBtn} className={`hidden ${buttonClassNames} text-2xl  !py-1 !px-4 !h-fit font-extrabold`}>+</button>)} /></>
                                     :
                                     <div className=' w-full rounded-sm bg-[#0E0E0E] border border-[#303030] text-lg py-1 px-4 text-[#969696]'>
@@ -287,13 +288,13 @@ export default function Page({ params }: { params: { id: string } }) {
                                         <h2>{trim(group ? group.name : "Group", 25)}</h2>
                                     </div>}
                             </section>
-                            
+
                         </article>
-                        {editMode ? 
-                        <div className=' w-full py-5  !hidden !md:flex'>
-                        <button onClick={handleFormSubmit} className={` ${buttonClassNames} w-full`}>
-                                Save
-                            </button> </div>: <></>}
+                        {editMode ?
+                            <div className=' w-full py-5  !hidden !md:flex'>
+                                <button onClick={handleFormSubmit} className={` ${buttonClassNames} w-full`}>
+                                    Save
+                                </button> </div> : <></>}
                     </section>
                     <section className=' w-full md:w-2/5 h-fit p-4 rounded-lg border border-[#3E3E3E] flex flex-col'>
                         <article className=' flex flex-col gap-2 w-full'>
@@ -307,21 +308,21 @@ export default function Page({ params }: { params: { id: string } }) {
                             <section className=' flex flex-col gap-1 w-full'>
                                 <label htmlFor="group">Select Max Number of Views</label>
 
-                                {editMode?<Dropdown className='!w-full' disabled={editMode ? data.public !== "true" : true} data={viewOptions.find((i) => i.value === data.views) ? viewOptions : [...viewOptions, { name: data.views, value: data.views }]} defaultSelectedItem={data.views} handleChange={handleViewChange} />
-                                :
-                                <div className=' py-1.5 px-2 text-sm rounded-lg border-[#595959] border bg-[#1B1B1B] w-fit'>
-                                {ogData?ogData.views:"0"}
-                            </div>}   
+                                {editMode ? <Dropdown className='!w-full' disabled={editMode ? data.public !== "true" : true} data={viewOptions.find((i) => i.value === data.views) ? viewOptions : [...viewOptions, { name: data.views, value: data.views }]} defaultSelectedItem={data.views} handleChange={handleViewChange} />
+                                    :
+                                    <div className=' py-1.5 px-2 text-sm rounded-lg border-[#595959] border bg-[#1B1B1B] w-fit'>
+                                        {ogData ? ogData.views : "0"}
+                                    </div>}
                             </section>
-                            <section className={` flex ${!editMode?"flex-row items-center":"flex-col"}  gap-1 w-full`}>
+                            <section className={` flex ${!editMode ? "flex-row items-center" : "flex-col"}  gap-1 w-full`}>
                                 <label htmlFor="team">Visibility:</label>
 
-                                {editMode?
-                                <Dropdown className='!w-full' disabled={!editMode} data={visibilityOptions} defaultSelectedItem={data.public} handleChange={handleVisibilityChange} />
-                                :
-                                <div className=' py-1.5 px-2 text-xs rounded-lg border-[#595959] border bg-[#1B1B1B] w-fit'>
-                                    {ogData?ogData.public?"Public":"Private":"Private"}
-                                </div>}
+                                {editMode ?
+                                    <Dropdown className='!w-full' disabled={!editMode} data={visibilityOptions} defaultSelectedItem={data.public} handleChange={handleVisibilityChange} />
+                                    :
+                                    <div className=' py-1.5 px-2 text-xs rounded-lg border-[#595959] border bg-[#1B1B1B] w-fit'>
+                                        {ogData ? ogData.public ? "Public" : "Private" : "Private"}
+                                    </div>}
                             </section>
                             <section className=' w-full'>
                                 <AlertComponent title='Are you sure?' description={`This will delete the password for "${data.name}"`} onAction={handleDelete} trigger={
@@ -333,22 +334,24 @@ export default function Page({ params }: { params: { id: string } }) {
                                     )
                                 } />
                             </section>
-                        
+
                         </article>
                         {/* <p className='  test p-6 '>hii</p> */}
-                        
+
                     </section>
-                    {editMode ? 
-                        <div className=' w-full py-3 !flex !md:hidden '>
-                        <button onClick={handleFormSubmit} className={` ${buttonClassNames} w-full`}>
-                                Save
-                            </button> </div>: <></>}
                     {/* {editMode ? <button type='submit' className={` ${buttonClassNames} w-full font-semibold text-xl flex justify-center items-center`}>
                     {"Edit"}
                 </button> : <></>} */}
-                
+
                 </div>
-                
+                {editMode ?
+                    <div className=' w-full py-3 !flex !md:hidden '>
+                        <button onClick={handleFormSubmit} className={` ${buttonClassNames} w-full`}>
+                            Save
+                        </button>
+                    </div>
+                    : <></>}
+
             </section>
         </div>
     )

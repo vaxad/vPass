@@ -1,4 +1,4 @@
-import { buttonClassNames, buttonDarkClassNames } from "@/utils/constants";
+import { buttonDarkClassNames } from "@/utils/constants";
 import Link from "next/link";
 
 export default function Home() {
@@ -10,6 +10,6 @@ export default function Home() {
         <a href="https://github.com/vaxad/vPass" target="_blank" className={` ${buttonDarkClassNames} text-center`}>Go to Repo</a>
         <Link href={'/auth'} className={` ${buttonDarkClassNames} text-center `} >Get Started</Link>
       </div>
-      </main>
+    </main>
   );
 }

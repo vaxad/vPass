@@ -3,7 +3,7 @@ import { CreateGroupData, CreatePasswordData, CreateTeamData, LoginData, SignupD
 import axios, { AxiosResponse } from "axios"
 
 const url = process.env.NEXT_PUBLIC_API_URL
-const catchErrorMessage = "Unauthorised!"
+const catchErrorMessage = "Unauthorised!";
 const noAuthTokenErrorMessage = "Please login or signup!"
 
 function authHeaders() {

@@ -25,7 +25,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html suppressHydrationWarning lang="en">
       <body className={inter.className + " min-h-screen flex bg-gradient-to-br from-[#060A13] to-[#000000] flex-col"}>
         <Toaster />
         <StateComponent>

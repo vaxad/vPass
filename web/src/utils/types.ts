@@ -6,9 +6,9 @@ export type SignupData = {
 }
 
 export type DropdownItem = {
-    name:string,
-    value:string,
-    onClickFn?: ()=>void
+    name: string,
+    value: string,
+    onClickFn?: () => void
 }
 
 export type LoginData = {
@@ -27,23 +27,23 @@ export type CreatePasswordData = {
 
 export type CreateTeamData = {
     name: string,
-    members:string[]
+    members: string[]
 }
 
 export type CreateGroupData = {
     name: string,
-    teamId:string
+    teamId: string
 }
-  
+
 export type User = {
-    id:   string,
+    id: string,
     username: string,
-    email:    string,
+    email: string,
     password: string,
-    salt:     string,
-    otp?:      string,
-    otpCreatedAt: Date, 
-    verified:  boolean, 
+    salt: string,
+    otp?: string,
+    otpCreatedAt: Date,
+    verified: boolean,
     createdAt: Date,
     passwords: Password[],
     groups: Group[],
@@ -57,42 +57,42 @@ export type User = {
 }
 
 export type Password = {
-    id:        string   
-    name:      string,
+    id: string
+    name: string,
     encrypted: string,
-    iv:      string,
-    createdAt: Date, 
-    userId:    string,
-    public:    boolean,
-    views:     number,      
-    user:      User,     
-    groupId:   string,
-    group:      Group  
-    teamId:    string,
-    team:      Team,  
+    iv: string,
+    createdAt: Date,
+    userId: string,
+    public: boolean,
+    views: number,
+    user: User,
+    groupId: string,
+    group: Group
+    teamId: string,
+    team: Team,
 }
 
 export type Group = {
-    id:        string      
-    name:      string,
-    createdAt: Date,    
-    user:      User,    
-    default: boolean,   
+    id: string
+    name: string,
+    createdAt: Date,
+    user: User,
+    default: boolean,
     passwords: Password[],
-    team:      Team,   
+    team: Team,
     _count: {
         passwords?: number
-    }   
+    }
 
 }
 
 export type Team = {
-    id:        string       
-    name:      string,
-    createdAt: Date,   
-    userId:   string,
+    id: string
+    name: string,
+    createdAt: Date,
+    userId: string,
     personal: boolean,
-    creator:     User,       
+    creator: User,
     passwords: Password[],
     groups: Group[],
     userTeam: UserTeam[],
@@ -105,12 +105,12 @@ export type Team = {
 
 
 export type UserTeam = {
-    id:        string       
-    userId:    string,
-    teamId:    string,
-    invited:   boolean,     
-    accepted:  boolean,     
-    user:      User,         
-    team:      Team,         
-    createdAt: Date,    
+    id: string
+    userId: string,
+    teamId: string,
+    invited: boolean,
+    accepted: boolean,
+    user: User,
+    team: Team,
+    createdAt: Date,
 }
