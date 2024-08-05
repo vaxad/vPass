@@ -20,7 +20,7 @@ export default function NewDropdown({ data, defaultSelectedItem, handleChange, d
     // console.log(data)
     return (
         <DropdownMenu>
-            <DropdownMenuTrigger disabled={disabled} className={`  flex text-white flex-row items-center gap-3 p-1 rounded-md outline-none bg-transparent border border-[#515151] transition-all ${disabled ? "" : ""}`}>
+            <DropdownMenuTrigger data-test="team-changer" disabled={disabled} className={`  flex text-white flex-row items-center gap-3 p-1 rounded-md outline-none bg-transparent border border-[#515151] transition-all ${disabled ? "" : ""}`}>
                 <div className=" p-1 bg-gradient-to-b from-[#181818] to-black aspect-square h-[35px]  flex justify-center items-center flex-shrink rounded-sm text-xl font-medium bg-transparent border border-[#515151]">
                     <h4 className=" text-white opacity-[36%] ">{selectedItem ? selectedItem.name[0].toUpperCase() : "T"}</h4>
                 </div>
@@ -41,7 +41,7 @@ export default function NewDropdown({ data, defaultSelectedItem, handleChange, d
                 {title ? <DropdownMenuLabel className=" !text-xs !py-1 !font-extralight">{title}</DropdownMenuLabel> : <></>}
                 {data.map((item, idx) => {
                     return (
-                        <DropdownMenuItem className={` text-sm font-normal ${item.value === defaultSelectedItem ? "text-white" : ""} ${item.onClickFn ? " font-semibold" : ""}`} key={`dropdown-item-${idx}`} onClick={() => item.onClickFn ? item.onClickFn() : handleSelect(idx)}>{item.name}</DropdownMenuItem>
+                        <DropdownMenuItem data-test={`drop-down-${title}-${idx}`} className={` text-sm font-normal ${item.value === defaultSelectedItem ? "text-white" : ""} ${item.onClickFn ? " font-semibold" : ""}`} key={`dropdown-item-${idx}`} onClick={() => item.onClickFn ? item.onClickFn() : handleSelect(idx)}>{item.name}</DropdownMenuItem>
                     )
                 })}
             </DropdownMenuContent>

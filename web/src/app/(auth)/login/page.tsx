@@ -30,11 +30,11 @@ export default function Page() {
             <form onSubmit={handleFormSubmit} className=' flex flex-col gap-2 bg-slate-50 text-zinc-950 p-6 rounded-md border border-slate-600 '>
                 <article className=' flex flex-col gap-1 w-full'>
                     <label htmlFor="email">Email <sub>{"(only valid emails)"}</sub></label>
-                    <input required minLength={2} pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}" name='email' className=' w-full px-4 py-2 rounded-md outline-none text-slate-50 bg-zinc-950 focus:bg-slate-50 focus:text-zinc-950 border border-zinc-950 transition-all' type="email" placeholder='joemama@alabama.com' value={data.email} onChange={handleChange} />
+                    <input data-test="login-email" required minLength={2} pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}" name='email' className=' w-full px-4 py-2 rounded-md outline-none text-slate-50 bg-zinc-950 focus:bg-slate-50 focus:text-zinc-950 border border-zinc-950 transition-all' type="email" placeholder='joemama@alabama.com' value={data.email} onChange={handleChange} />
                 </article>
                 <article className=' flex flex-col gap-1 w-full'>
                     <label htmlFor="password">Password <sub>{"(minimum 8 characters, with at least 1 uppercase, 1 lowercase, 1 digit, and 1 special character [!@#$%^&*()])"}</sub></label>
-                    <input required minLength={8} pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()]).{8,}$" name='password' className=' w-full px-4 py-2 rounded-md outline-none text-slate-50 bg-zinc-950 focus:bg-slate-50 focus:text-zinc-950 border border-zinc-950 transition-all' type={show ? "text" : "password"} placeholder='JoeMama#1276' value={data.password} onChange={handleChange} />
+                    <input data-test="login-password" required minLength={8} pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()]).{8,}$" name='password' className=' w-full px-4 py-2 rounded-md outline-none text-slate-50 bg-zinc-950 focus:bg-slate-50 focus:text-zinc-950 border border-zinc-950 transition-all' type={show ? "text" : "password"} placeholder='JoeMama#1276' value={data.password} onChange={handleChange} />
                     <div className=' flex flex-row gap-1  py-1 justify-start items-center'>
                         <input type="checkbox" className=' accent-black h-4 w-4' value={show ? "checked" : "unchecked"} onChange={(e) => { setShow((prev) => !prev) }} />
                         <h3 className=' text-xs'>Show password</h3>
